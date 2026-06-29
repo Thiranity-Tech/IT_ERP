@@ -320,7 +320,7 @@ function ticketStatus(status) {
 
 function formatTicketStatus(status) {
   const normalized = String(status || "").trim().toUpperCase();
-  if (normalized === "SUBMITTED_FOR_APPROVAL") return "Submitted";
+  if (normalized === "SUBMITTED_FOR_APPROVAL") return "Submitted for approval";
   if (normalized === "APPROVED") return "Approved";
   if (normalized === "IN_PROGRESS") return "In progress";
   if (normalized === "RESOLVED") return "Resolved";
@@ -332,7 +332,7 @@ function formatTicketStatus(status) {
 }
 
 function timelineHint(step) {
-  if (step === "SUBMITTED_FOR_APPROVAL") return "Waiting on CRM manager";
+  if (step === "SUBMITTED_FOR_APPROVAL") return "Waiting for CRM manager approval";
   if (step === "APPROVED") return "Ready for work";
   if (step === "IN_PROGRESS") return "Being worked on";
   if (step === "CLOSED") return "Completed and archived";

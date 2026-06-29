@@ -391,7 +391,8 @@ function buildPayslipPdf(payroll) {
   const left = margin;
   const tableWidth = pageWidth - margin * 2;
   const halfWidth = (tableWidth - 12) / 2;
-  const sectionHeight = 146;
+  const rowHeight = 22;
+  const sectionHeight = 138;
   const earningsX = left;
   const deductionsX = left + halfWidth + 12;
 
@@ -420,31 +421,34 @@ function buildPayslipPdf(payroll) {
   ];
   const deductions = [
     ["Loss of Pay", formatPdfMoney(roundNumber(payroll.lossOfPay || 0))],
-    ["Net Pay", formatPdfMoney(netPay)],
     ["Attendance", `${roundNumber(payroll.attendancePercentage || 0)}%`],
+    ["", ""],
     ["", ""],
   ];
 
   earnings.forEach((item, index) => {
-    const y = tableTop - 48 - index * 24;
+    const y = tableTop - 46 - index * rowHeight;
     text(earningsX + 12, y, 9, item[0]);
-    text(earningsX + halfWidth - 88, y, 9, item[1], true);
+    text(earningsX + halfWidth - 96, y, 9, item[1], true);
   });
 
   deductions.forEach((item, index) => {
-    const y = tableTop - 48 - index * 24;
+    const y = tableTop - 46 - index * rowHeight;
     text(deductionsX + 12, y, 9, item[0]);
-    text(deductionsX + halfWidth - 88, y, 9, item[1], true);
+    text(deductionsX + halfWidth - 96, y, 9, item[1], true);
   });
 
-  const totalY = tableTop - 190;
-  addRect(margin, totalY - 10, pageWidth - margin * 2, 70, 1.0);
-  text(margin + 12, totalY + 32, 9, "Net Pay", true);
-  text(margin + 12, totalY + 12, 22, currency.format(roundNumber(payroll.finalSalary || 0)), true);
-  text(pageWidth - margin - 200, totalY + 18, 10, "Prepared by IT ERP");
+  const tableBottomY = tableTop - sectionHeight;
+  const footerHeight = 80;
+  const footerGap = 18;
+  const footerY = tableBottomY - footerHeight - footerGap;
+  addRect(margin, footerY, pageWidth - margin * 2, footerHeight, 1.0);
+  text(margin + 12, footerY + 48, 9, "Net Pay", true);
+  text(margin + 12, footerY + 20, 20, formatPdfMoney(netPay), true);
+  text(pageWidth - margin - 144, footerY + 26, 10, "Prepared by IT ERP");
 
-  addLine(margin, totalY - 18, pageWidth - margin, totalY - 18, 0.8);
-  text(margin, totalY - 38, 8, "If you have questions, contact the finance department.");
+  addLine(margin, footerY - 16, pageWidth - margin, footerY - 16, 0.8);
+  text(margin, footerY - 32, 8, "If you have questions, contact the finance department.");
 
   const content = lines.join("\n");
   return createPdfBlob(content, pageWidth, pageHeight);

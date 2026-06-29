@@ -107,7 +107,7 @@ function ticketStatus(status) {
 
 function formatTicketStatus(status) {
   const normalized = String(status || "").trim().toUpperCase();
-  if (normalized === "SUBMITTED_FOR_APPROVAL") return "Submitted";
+  if (normalized === "SUBMITTED_FOR_APPROVAL") return "Submitted for approval";
   if (normalized === "APPROVED") return "Approved";
   if (normalized === "IN_PROGRESS") return "In progress";
   if (normalized === "RESOLVED") return "Resolved";
