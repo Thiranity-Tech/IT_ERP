@@ -1,0 +1,12 @@
+{
+  "name": "it-erp-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173",
+    "dev:backend": "npm --prefix backend start",
+    "dev:frontend": "npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173",
+    "build:frontend": "npm --prefix frontend run build",
+    "start:backend": "npm --prefix backend start"
+  }
+}

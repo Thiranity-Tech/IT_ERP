@@ -1,0 +1,575 @@
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "employeeId": "SA001",
+    "password": "admin789"
+}
+### Profile
+GET http://localhost:3000/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTIzMzIxLCJleHAiOjE3ODIyMDk3MjF9.H0EzrIxPr_sWy9RORCJSvNWvw8B9fyaofd7zYccq0es
+### Departments
+POST http://localhost:3000/departments
+Content-Type: application/json
+
+{
+  "name": "Human Resources"
+}
+
+###
+
+### Get Departments
+GET http://localhost:3000/departments
+### Get Department by ID
+GET http://localhost:3000/departments/1
+### Update Department
+PUT http://localhost:3000/departments/1
+Content-Type: application/json
+
+{
+  "name": "Admin Department"
+}
+### Delete Department
+DELETE http://localhost:3000/departments/2
+###Get Teams
+GET http://localhost:3000/teams
+### Create Team
+POST http://localhost:3000/teams
+Content-Type: application/json
+
+{
+  "name": "Development",
+  "departmentId": 1
+}
+### Get Teams
+GET http://localhost:3000/teams
+### Get Team by ID
+GET http://localhost:3000/teams/1
+### Update Team
+PUT http://localhost:3000/teams/1
+Content-Type: application/json
+
+{
+  "name": "Development Team",
+  "departmentId": 1
+}
+### Delete Team
+DELETE http://localhost:3000/teams/1
+### Create Team
+POST http://localhost:3000/teams
+Content-Type: application/json
+
+{
+  "name": "Testing Team",
+  "departmentId": 1
+}
+### delete Team
+DELETE http://localhost:3000/teams/2
+### Get Users
+GET http://localhost:3000/users
+### Create User
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "employeeId": "EMP001",
+  "name": "John",
+  "email": "john@erp.com",
+  "password": "123456",
+  "roleId": 1,
+  "teamId": 1
+}
+### Get User by ID
+GET http://localhost:3000/users/1
+### Update User
+PUT http://localhost:3000/users/1
+Content-Type: application/json
+
+{
+  "name": "Super Admin Updated",
+  "email": "superadmin@erp.com",
+  "roleId": 5,
+  "teamId": 1
+}
+### Delete User
+DELETE http://localhost:3000/users/2
+#### Create User with Authorization
+POST http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMDcyMjM1LCJleHAiOjE3ODIxNTg2MzV9.iwavf0XSSMdYsQCyEMGQo18D5nkOstrK0oNPlp7M8gw
+Content-Type: application/json
+
+{
+  "employeeId": "EMP003",
+  "name": "Test User",
+  "email": "testuser@erp.com",
+  "password": "123456",
+  "roleId": 1,
+  "teamId": 1
+}
+### Get Projects
+GET http://localhost:3000/projects
+#### Create Project
+
+POST http://localhost:3000/projects
+Content-Type: application/json
+
+{
+  "name": "ERP Development",
+  "clientName": "ABC Company",
+  "description": "Internal ERP System",
+  "startDate": "2026-06-21",
+  "deadline": "2026-12-31",
+  "priority": "High",
+  "status": "Active"
+}
+### Get Projects
+GET http://localhost:3000/projects
+### update Project
+PUT http://localhost:3000/projects/1
+Content-Type: application/json
+
+{
+  "name": "ERP Development Updated",
+  "clientName": "ABC Company",
+  "description": "Updated Project",
+  "startDate": "2026-06-21",
+  "deadline": "2026-12-31",
+  "priority": "Medium",
+  "status": "In Progress"
+}
+### Delete Project
+DELETE http://localhost:3000/projects/1
+### test task
+POST http://localhost:3000/tasks
+### create Task
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+  "title": "Design Dashboard",
+  "description": "Create ERP dashboard UI",
+  "status": "Pending",
+  "deadline": "2026-07-01",
+  "projectId": 1,
+  "userId": 1
+}
+### Create Tasks
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+  "title": "Design Dashboard",
+  "description": "Create ERP dashboard UI",
+  "status": "Pending",
+  "deadline": "2026-07-01",
+  "projectId": 2,
+  "userId": 1
+}
+### Get Tasks by ID
+GET http://localhost:3000/tasks/3
+### Update Task
+PUT http://localhost:3000/tasks/3
+Content-Type: application/json
+
+{
+  "title": "Design Dashboard Updated",
+  "description": "Updated UI work",
+  "status": "In Progress",
+  "deadline": "2026-07-15",
+  "projectId": 2,
+  "userId": 1
+}
+### Delete Task
+DELETE http://localhost:3000/tasks/3
+### Get Attendance Records
+GET http://localhost:3000/attendance
+### Create Attendance Record
+POST http://localhost:3000/attendance
+Content-Type: application/json
+
+{
+  "date": "2026-06-22",
+  "checkIn": "2026-06-22T09:00:00",
+  "checkOut": "2026-06-22T18:00:00",
+  "lateMinutes": 0,
+  "overtimeMinutes": 60,
+  "userId": 1
+}
+### Get Attendance Record by ID
+GET http://localhost:3000/attendance/1
+### Update Attendance Record
+PUT http://localhost:3000/attendance/1
+Content-Type: application/json
+
+{
+  "date": "2026-06-22",
+  "checkIn": "2026-06-22T09:15:00",
+  "checkOut": "2026-06-22T18:45:00",
+  "lateMinutes": 15,
+  "overtimeMinutes": 45,
+  "userId": 1
+}
+### Delete Attendance Record
+DELETE http://localhost:3000/attendance/1
+#### Get Leave Requests
+GET http://localhost:3000/leave-requests
+#### Create Leave Request
+POST http://localhost:3000/leave-requests
+Content-Type: application/json
+
+{
+  "leaveType": "Sick Leave",
+  "reason": "Fever",
+  "startDate": "2026-06-25",
+  "endDate": "2026-06-27",
+  "userId": 1
+}
+### Get Leave Request by ID
+GET http://localhost:3000/leave-requests/1
+### Update Leave Status
+PUT http://localhost:3000/leave-requests/1/status
+Content-Type: application/json
+
+{
+  "status": "REJECTED"
+}
+### Update Leave Request
+PUT http://localhost:3000/leave-requests/1
+Content-Type: application/json
+
+{
+  "leaveType": "Casual Leave",
+  "reason": "Family Function",
+  "startDate": "2026-06-28",
+  "endDate": "2026-06-30"
+}
+### Delete Leave Request
+DELETE http://localhost:3000/leave-requests/1
+### Get payrolls
+GET http://localhost:3000/payrolls
+### Create Payroll
+POST http://localhost:3000/payrolls
+Content-Type: application/json
+
+{
+  "month": "June 2026",
+  "attendancePercentage": 95,
+  "overtimeAmount": 5000,
+  "incentiveAmount": 2000,
+  "lossOfPay": 1000,
+  "userId": 1
+}
+### Get Payroll by ID
+GET http://localhost:3000/payrolls/1
+### Update Payroll
+PUT http://localhost:3000/payrolls/1
+Content-Type: application/json
+
+{
+  "month": "July 2026",
+  "attendancePercentage": 98,
+  "overtimeAmount": 7000,
+  "incentiveAmount": 3000,
+  "lossOfPay": 500,
+  "userId": 1
+}
+### Delete Payroll
+DELETE http://localhost:3000/payrolls/1
+### Get clients
+GET http://localhost:3000/clients
+### Create Client
+POST http://localhost:3000/clients
+Content-Type: application/json
+
+{
+  "name": "ABC Technologies",
+  "contactPerson": "John Smith",
+  "email": "john@abc.com",
+  "phone": "9876543210"
+}
+### Get Client by ID
+GET http://localhost:3000/clients/1
+### Update Client
+PUT http://localhost:3000/clients/1
+Content-Type: application/json
+
+{
+  "name": "ABC Technologies Updated",
+  "contactPerson": "John Smith",
+  "email": "johnupdated@abc.com",
+  "phone": "9999999999"
+}
+### Delete Client
+DELETE http://localhost:3000/clients/1
+### Get support tickets
+GET http://localhost:3000/support-tickets
+### Create Support Ticket
+POST http://localhost:3000/support-tickets
+Content-Type: application/json
+
+{
+  "title": "Login Issue",
+  "description": "Unable to login to ERP portal",
+  "status": "OPEN",
+  "clientId": 2
+}
+### Get Support Ticket by ID
+GET http://localhost:3000/support-tickets/3
+### Update Support Ticket
+PUT http://localhost:3000/support-tickets/3
+Content-Type: application/json
+
+{
+  "title": "Login Issue Resolved",
+  "description": "Password reset completed",
+  "status": "CLOSED",
+  "clientId": 2
+}
+### Delete Support Ticket
+DELETE http://localhost:3000/support-tickets/3
+### Get notifications
+GET http://localhost:3000/notifications
+### Create Notification
+POST http://localhost:3000/notifications
+Content-Type: application/json
+
+{
+  "message": "Leave request approved",
+  "userId": 1
+}
+### Get Notification by ID
+GET http://localhost:3000/notifications/1
+### Update Notification
+PUT http://localhost:3000/notifications/1
+Content-Type: application/json
+
+{
+  "message": "Leave request approved successfully",
+  "isRead": true,
+  "userId": 1
+}
+### Delete Notification
+DELETE http://localhost:3000/notifications/1
+### Get daily scrums
+GET http://localhost:3000/daily-scrums
+### Create Daily Scrum
+POST http://localhost:3000/daily-scrums
+Content-Type: application/json
+
+{
+  "yesterday": "Completed login module",
+  "today": "Working on attendance module",
+  "blockers": "None",
+  "userId": 1
+}
+### Get Daily Scrum by ID
+GET http://localhost:3000/daily-scrums/1
+### Update Daily Scrum
+PUT http://localhost:3000/daily-scrums/1
+Content-Type: application/json
+
+{
+  "yesterday": "Completed attendance module",
+  "today": "Working on payroll module",
+  "blockers": "None",
+  "userId": 1
+}
+### Delete Daily Scrum
+DELETE http://localhost:3000/daily-scrums/1
+### Get Incentives
+GET http://localhost:3000/incentives
+### Create Incentive
+POST http://localhost:3000/incentives
+Content-Type: application/json
+
+{
+  "amount": 5000,
+  "reason": "Outstanding Performance",
+  "userId": 1
+}
+### Get Incentive by ID
+GET http://localhost:3000/incentives/1
+### Update Incentive
+PUT http://localhost:3000/incentives/1
+Content-Type: application/json
+
+{
+  "amount": 7500,
+  "reason": "Excellent Performance",
+  "userId": 1
+}
+### Delete Incentive
+DELETE http://localhost:3000/incentives/1
+### Get project notes
+GET http://localhost:3000/project-notes
+### Create Project Note
+POST http://localhost:3000/project-notes
+Content-Type: application/json
+
+{
+  "note": "Initial project setup completed",
+  "projectId": 2,
+  "userId": 1
+}
+### Get Project Note by ID
+GET http://localhost:3000/project-notes/3
+### Update Project Note
+PUT http://localhost:3000/project-notes/3
+Content-Type: application/json
+
+{
+  "note": "Database schema and APIs completed",
+  "projectId": 2,
+  "userId": 1
+}
+### Delete Project Note
+DELETE http://localhost:3000/project-notes/3
+### Get Reports
+GET http://localhost:3000/reports
+### Create Report
+POST http://localhost:3000/reports
+Content-Type: application/json
+
+{
+  "title": "Monthly Attendance Report",
+  "fileUrl": "https://example.com/reports/attendance-june.pdf"
+}
+### Get Report by ID
+GET http://localhost:3000/reports/1
+### Update Report
+PUT http://localhost:3000/reports/1
+Content-Type: application/json
+
+{
+  "title": "Updated Attendance Report",
+  "fileUrl": "https://example.com/reports/updated-attendance.pdf"
+}
+### Delete Report
+DELETE http://localhost:3000/reports/1
+### Get dashboard
+GET http://localhost:3000/dashboard
+### Get attendance stats
+GET http://localhost:3000/dashboard/attendance-stats
+### Get project stats
+GET http://localhost:3000/dashboard/project-stats
+### Get employee stats
+GET http://localhost:3000/dashboard/employee-stats
+### Get payroll stats
+GET http://localhost:3000/dashboard/payroll-stats
+### Get support stats
+GET http://localhost:3000/dashboard/support-stats
+### Get report stats
+GET http://localhost:3000/dashboard/report-stats
+### Search Projects
+GET http://localhost:3000/projects/search?q=ERP
+### Search Users
+GET http://localhost:3000/users/search?q=john
+### Search Clients
+GET http://localhost:3000/clients/search?q=ABC
+### Search Support Tickets
+GET http://localhost:3000/support-tickets/search?q=Issue
+### Global Search
+GET http://localhost:3000/search?q=ERP
+### Project Prioritization
+GET http://localhost:3000/analytics/project-priority
+### Leave Status Analytics
+GET http://localhost:3000/analytics/leave-status
+### Ticket Status Analytics
+GET http://localhost:3000/analytics/ticket-status
+### Payroll Summary Analytics
+GET http://localhost:3000/analytics/payroll-summary
+### Attendance Analytics
+GET http://localhost:3000/analytics/attendance
+### Client Summary Analytics
+GET http://localhost:3000/analytics/client-summary
+### Monthly Payroll Analytics
+GET http://localhost:3000/analytics/monthly-payroll
+### Project Status Analytics
+GET http://localhost:3000/analytics/project-status
+### User Role Analytics
+GET http://localhost:3000/analytics/user-roles
+### Team Analytics
+GET http://localhost:3000/analytics/teams
+### Analytics Overview
+GET http://localhost:3000/analytics/overview
+### Test login API
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "employeeId": "SA001",
+    "password": "admin123"
+}
+### Test profile API
+GET http://localhost:3000/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTE2MDc5LCJleHAiOjE3ODIyMDI0Nzl9.CPauyVW1miSymvBrqCCcTSfSCP6uQG8oBJK_dIVdM8M
+#### Test reports API
+GET http://localhost:3000/reports
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTE2MDc5LCJleHAiOjE3ODIyMDI0Nzl9.CPauyVW1miSymvBrqCCcTSfSCP6uQG8oBJK_dIVdM8M
+#### Test analytics API
+GET http://localhost:3000/analytics/user-roles
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTE2MDc5LCJleHAiOjE3ODIyMDI0Nzl9.CPauyVW1miSymvBrqCCcTSfSCP6uQG8oBJK_dIVdM8M
+### Test analytics API
+GET http://localhost:3000/analytics/teams
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTE2MDc5LCJleHAiOjE3ODIyMDI0Nzl9.CPauyVW1miSymvBrqCCcTSfSCP6uQG8oBJK_dIVdM8M
+### Test analytics API
+PUT http://localhost:3000/auth/change-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTE2MDc5LCJleHAiOjE3ODIyMDI0Nzl9.CPauyVW1miSymvBrqCCcTSfSCP6uQG8oBJK_dIVdM8M
+Content-Type: application/json
+
+{
+  "currentPassword": "admin123",
+  "newPassword": "admin456"
+}
+### Test login API with new password
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "employeeId": "SA001",
+  "password": "admin456"
+}
+### Test forgot password API
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "employeeId": "SA001",
+  "newPassword": "admin789"
+}
+### Test login API with reset password
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "employeeId": "SA001",
+  "password": "admin789"
+}
+### Test reports API without authorization
+GET http://localhost:3000/reports/2
+### Test reports API with authorization
+GET http://localhost:3000/notifications
+### Test create notification API
+POST http://localhost:3000/notifications
+Content-Type: application/json
+
+{
+  "message": "Payroll generated successfully",
+  "userId": 1
+}
+### Test get notifications API
+GET http://localhost:3000/notifications
+### Test update notification API
+PUT http://localhost:3000/notifications/4/read
+### Test create daily scrum API
+POST http://localhost:3000/daily-scrums
+Content-Type: application/json
+
+{
+  "yesterday": "Completed notification module",
+  "today": "Working on daily scrum module",
+  "blockers": "None",
+  "userId": 1
+}
+### Test get daily scrums API
+GET http://localhost:3000/daily-scrums

@@ -1,0 +1,35 @@
+{
+  "id": 1,
+  "title": "Build authentication screens",
+  "description": "Add login and password reset UI.",
+  "status": "Completed",
+  "deadline": "2026-07-01T00:00:00.000Z",
+  "createdAt": "2026-06-29T21:53:17.284Z",
+  "assignedAt": "2026-06-29T21:53:17.284Z",
+  "completedAt": "2026-06-29T21:53:35.546Z",
+  "projectId": 1,
+  "userId": 6,
+  "project": {
+    "id": 1,
+    "name": "ERP Revamp",
+    "clientName": "Acme Corp",
+    "description": "Internal ERP workflow upgrade.",
+    "startDate": "2026-06-01T00:00:00.000Z",
+    "deadline": "2026-07-31T00:00:00.000Z",
+    "priority": "High",
+    "status": "In Progress",
+    "departmentId": 1,
+    "department": {
+      "id": 1,
+      "name": "Engineering"
+    }
+  },
+  "user": {
+    "id": 6,
+    "employeeId": "DEV001",
+    "name": "Developer One",
+    "email": "dev@erp.com",
+    "roleId": 1,
+    "designation": "Software Developer"
+  }
+}

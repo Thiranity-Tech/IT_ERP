@@ -1,0 +1,28 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Backend uploads generated during testing
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Frontend output
+frontend/dist/
+frontend/.vite/
+
+# Android
+mobile-app/.gradle/
+mobile-app/build/
+mobile-app/app/build/
+mobile-app/local.properties
+mobile-app/*.iml
+mobile-app/.idea/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/

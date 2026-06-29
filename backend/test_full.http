@@ -1,0 +1,202 @@
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "employeeId": "SA001",
+  "password": "admin789"
+}
+### Test case for creating a new department
+POST http://localhost:3000/departments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "name": "Development"
+}
+### Test to create team
+POST http://localhost:3000/teams
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "name": "Backend Team",
+  "departmentId": 5
+}
+### Test to get roles
+GET http://localhost:3000/
+### Test to get users
+POST http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "employeeId": "EMP001",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "9876543210",
+  "designation": "Software Engineer",
+  "salary": 50000,
+  "password": "password123",
+  "roleId": 1,
+  "teamId": 4
+}
+### Test with clients
+POST http://localhost:3000/clients
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "name": "ABC Technologies",
+  "contactPerson": "Raj Kumar",
+  "email": "raj@abctech.com",
+  "phone": "9876543210"
+}
+### Verfiy clients 
+GET http://localhost:3000/clients
+### Test using create project
+POST http://localhost:3000/projects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "name": "ERP System",
+  "clientName": "ABC Technologies",
+  "description": "Employee Resource Planning System",
+  "startDate": "2026-06-22T00:00:00.000Z",
+  "deadline": "2026-12-31T00:00:00.000Z",
+  "priority": "HIGH",
+  "status": "IN_PROGRESS"
+}
+### Verify Projects
+GET http://localhost:3000/projects
+### Test with create Task
+POST http://localhost:3000/tasks
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "title": "Implement JWT Authentication",
+  "description": "Create login and token validation",
+  "status": "PENDING",
+  "deadline": "2026-07-15T00:00:00.000Z",
+  "projectId": 3,
+  "userId": 4
+}
+### Verify Task
+GET http://localhost:3000/tasks
+### Test with create Attendance
+POST http://localhost:3000/attendance
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "date": "2026-06-22T00:00:00.000Z",
+  "checkIn": "2026-06-22T09:00:00.000Z",
+  "checkOut": "2026-06-22T18:00:00.000Z",
+  "lateMinutes": 0,
+  "overtimeMinutes": 60,
+  "userId": 4
+}
+### Verify attendance
+GET http://localhost:3000/attendance
+### Test with create LeaveRequests
+POST http://localhost:3000/leave-requests
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "leaveType": "SICK_LEAVE",
+  "reason": "Fever and cold",
+  "startDate": "2026-06-25T00:00:00.000Z",
+  "endDate": "2026-06-27T00:00:00.000Z",
+  "status": "PENDING",
+  "userId": 4
+}
+### Verify LeaveRequests
+GET http://localhost:3000/leave-requests
+### Test with create Payroll
+POST http://localhost:3000/payrolls
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "month": "June 2026",
+  "attendancePercentage": 95,
+  "overtimeAmount": 5000,
+  "incentiveAmount": 2000,
+  "lossOfPay": 0,
+  "finalSalary": 57000,
+  "userId": 4
+}
+### Verify payrolls
+GET http://localhost:3000/payrolls
+### Test with create incentive
+POST http://localhost:3000/incentives
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "amount": 3000,
+  "reason": "Excellent performance in ERP project",
+  "userId": 4
+}
+### Verify incentive
+GET http://localhost:3000/incentives
+### Test with create notifications
+POST http://localhost:3000/notifications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "message": "Payroll generated successfully",
+  "userId": 4
+}
+### Verify notifications
+
+GET http://localhost:3000/notifications
+### Test create daily scrum
+POST http://localhost:3000/daily-scrums
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "yesterday": "Completed JWT authentication module",
+  "today": "Working on payroll module",
+  "blockers": "None",
+  "userId": 4
+}
+### Verify daily scrums
+GET http://localhost:3000/daily-scrums
+### Test with create project notes
+POST http://localhost:3000/project-notes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "note": "JWT authentication and payroll modules completed successfully.",
+  "projectId": 3,
+  "userId": 4
+}
+### Verify project notes
+GET http://localhost:3000/project-notes
+### Test with create support ticket
+POST http://localhost:3000/support-tickets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGVJZCI6NSwiaWF0IjoxNzgyMTI0NDY3LCJleHAiOjE3ODIyMTA4Njd9.1sO1De7vRmfwL5_jp2GFJMowSGOn87MkL-i4MuROFYU
+Content-Type: application/json
+
+{
+  "title": "Unable to generate payroll report",
+  "description": "Payroll report download is failing for June 2026.",
+  "status": "OPEN",
+  "clientId": 3
+}
+### Verify support ticket
+GET http://localhost:3000/support-tickets
+### Verify dashboard
+GET http://localhost:3000/dashboard
+### Verify attendance
+GET http://localhost:3000/analytics/attendance
+### Verify payroll
+GET http://localhost:3000/analytics/monthly-payroll
+### Verify projects
+GET http://localhost:3000/analytics/project-status
