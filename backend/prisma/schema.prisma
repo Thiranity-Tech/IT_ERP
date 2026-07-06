@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  users User[]
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  teams Team[]
+  users User[]
+  projects Project[]
+}
+
+model Team {
+  id           Int    @id @default(autoincrement())
+  name         String
+  departmentId Int
+
+  department Department @relation(fields: [departmentId], references: [id])
+
+  users User[]
+}
+
+model User {
+  id          Int     @id @default(autoincrement())
+  employeeId  String  @unique
+  name        String
+  email       String  @unique
+  phone       String?
+  designation String?
+  salary      Float?
+  password String
+
+  roleId Int
+  teamId Int?
+  departmentId Int?
+
+  role          Role           @relation(fields: [roleId], references: [id])
+  team          Team?          @relation(fields: [teamId], references: [id])
+  department    Department?    @relation(fields: [departmentId], references: [id])
+  tasks         Task[]
+  attendance    Attendance[]
+  leaveRequests LeaveRequest[]
+  payrolls      Payroll[]
+  incentives    Incentive[]
+  notifications Notification[]
+  dailyScrums   DailyScrum[]
+  projectNotes  ProjectNote[]
+  supportTicketNotes SupportTicketNote[]
+  supportTicketEvents SupportTicketEvent[]
+  assignedSupportTickets SupportTicket[] @relation("SupportTicketAssignee")
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  clientName  String
+  description String?
+  startDate   DateTime
+  deadline    DateTime
+  priority    String
+  status      String
+  departmentId Int?
+
+  department   Department? @relation(fields: [departmentId], references: [id])
+  tasks        Task[]
+  supportTickets SupportTicket[]
+  projectNotes ProjectNote[]
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String
+  deadline    DateTime
+  createdAt   DateTime @default(now())
+  assignedAt  DateTime @default(now())
+  completedAt DateTime?
+
+  projectId Int
+  userId    Int
+
+  project Project @relation(fields: [projectId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Attendance {
+  id              Int       @id @default(autoincrement())
+  date            DateTime @db.Date
+  checkIn         DateTime?
+  checkOut        DateTime?
+  lateMinutes     Int       @default(0)
+  overtimeMinutes Int       @default(0)
+  status          String?
+  remarks         String?
+  userId          Int
+
+  user User @relation(fields: [userId], references: [id])
+}
+model OfficeSetting {
+  id            Int      @id @default(autoincrement())
+
+  officeStart   String   // 09:00
+  officeEnd     String   // 18:00
+
+  graceMinutes  Int      @default(10)
+
+  createdAt     DateTime @default(now())
+}
+model LeaveRequest {
+  id           Int      @id @default(autoincrement())
+  leaveType    String
+  reason       String
+  startDate    DateTime
+  endDate      DateTime
+  status       String
+
+  userId       Int
+  user         User @relation(fields: [userId], references: [id])
+
+  approvedById Int?
+}
+
+model Payroll {
+  id                   Int    @id @default(autoincrement())
+  month                String
+  baseSalary           Float  @default(0)
+  attendancePercentage Float
+  overtimeAmount       Float  @default(0)
+  incentiveAmount      Float  @default(0)
+  lossOfPay            Float  @default(0)
+  finalSalary          Float
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Incentive {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  reason    String
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Client {
+  id            Int     @id @default(autoincrement())
+  name          String
+  contactPerson String
+  email         String
+  phone         String?
+
+  tickets SupportTicket[]
+}
+
+model SupportTicket {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String?
+  priority       String   @default("Low")
+  category       String   @default("Support")
+  sourceChannel  String   @default("Portal")
+  status         String
+  rejectionReason String?
+  createdAt      DateTime @default(now())
+
+  clientId    Int
+  assignedToId Int?
+  projectId   Int?
+
+  client      Client @relation(fields: [clientId], references: [id])
+  assignedTo  User?  @relation("SupportTicketAssignee", fields: [assignedToId], references: [id])
+  project     Project? @relation(fields: [projectId], references: [id])
+  notes       SupportTicketNote[]
+  events      SupportTicketEvent[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model SupportTicketNote {
+  id        Int      @id @default(autoincrement())
+  note      String
+  createdAt DateTime @default(now())
+
+  ticketId Int
+  userId   Int
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id])
+}
+
+model SupportTicketEvent {
+  id         Int      @id @default(autoincrement())
+  action     String
+  detail     String?
+  fromStatus  String?
+  toStatus    String?
+  createdAt  DateTime @default(now())
+
+  ticketId Int
+  userId   Int
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id])
+}
+
+model DailyScrum {
+  id        Int      @id @default(autoincrement())
+  yesterday String?
+  today     String
+  blockers  String?
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  title      String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+}
+
+model ProjectNote {
+  id        Int      @id @default(autoincrement())
+  note      String
+  createdAt DateTime @default(now())
+
+  projectId Int
+  userId    Int
+
+  project Project @relation(fields: [projectId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}

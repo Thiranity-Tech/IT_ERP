@@ -1,0 +1,131 @@
+plugins {
+    id "com.android.application"
+}
+
+def loadSdkDir = {
+    def propertiesFile = rootProject.file("local.properties")
+    def props = new java.util.Properties()
+    if (propertiesFile.exists()) {
+        propertiesFile.withInputStream { stream ->
+            props.load(stream)
+        }
+    }
+    return props.getProperty("sdk.dir")
+}
+
+def releaseTasksRequested = project.gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
+
+def detectLanApiBaseUrl = {
+    try {
+        def candidate = java.net.NetworkInterface.networkInterfaces
+                .findAll { iface ->
+                    iface.isUp() && !iface.isLoopback() && !iface.isVirtual()
+                }
+                .collectMany { iface ->
+                    iface.inetAddresses.toList().collect { addr -> [iface: iface, addr: addr] }
+                }
+                .find { entry ->
+                    entry.addr instanceof java.net.Inet4Address &&
+                    !entry.addr.loopbackAddress &&
+                    entry.addr.hostAddress &&
+                    !entry.addr.hostAddress.startsWith("169.254.") &&
+                    entry.addr.siteLocalAddress &&
+                    !entry.iface.name.toLowerCase().contains("docker") &&
+                    !entry.iface.name.toLowerCase().contains("vbox") &&
+                    !entry.iface.name.toLowerCase().contains("vmnet") &&
+                    !entry.iface.name.toLowerCase().contains("hyper-v") &&
+                    !entry.iface.name.toLowerCase().contains("virtual") &&
+                    !entry.iface.name.toLowerCase().contains("tun") &&
+                    !entry.iface.name.toLowerCase().contains("tap")
+                }?.addr
+
+        if (candidate) {
+            return "http://${candidate.hostAddress}:3000"
+        }
+    } catch (ignored) {
+        // Fall through to the configured release URL.
+    }
+
+    return null
+}
+
+def resolveReleaseApiBaseUrl = {
+    def overrideUrl = project.findProperty("API_BASE_URL")
+    if (overrideUrl) {
+        return overrideUrl.toString().replaceAll(/\/+$/, "")
+    }
+
+    if (releaseTasksRequested) {
+        println("Warning: API_BASE_URL was not provided for release. Falling back to a local/dev URL.")
+    }
+    return detectLanApiBaseUrl() ?: "http://10.0.2.2:3000"
+}
+
+def debugApiBaseUrl = detectLanApiBaseUrl() ?: "http://10.0.2.2:3000"
+def releaseApiBaseUrl = resolveReleaseApiBaseUrl()
+def webApiBaseUrl = releaseTasksRequested ? releaseApiBaseUrl : debugApiBaseUrl
+def sdkDir = loadSdkDir()
+def adbExecutable = sdkDir ? new File(new File(sdkDir), "platform-tools/adb.exe") : null
+
+android {
+    namespace "com.iterp.mobile"
+    compileSdk 35
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs += "$buildDir/generated/web-config"
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.iterp.mobile"
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "API_BASE_URL", "\"${debugApiBaseUrl}\""
+            buildConfigField "boolean", "ALLOW_API_SETTINGS", "true"
+        }
+        release {
+            buildConfigField "String", "API_BASE_URL", "\"${releaseApiBaseUrl}\""
+            buildConfigField "boolean", "ALLOW_API_SETTINGS", "false"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.register("generateWebConfig") {
+    outputs.file("$buildDir/generated/web-config/web/config.js")
+    doLast {
+        def outputDir = file("$buildDir/generated/web-config/web")
+        outputDir.mkdirs()
+        file("$outputDir/config.js").text = "window.__IT_ERP_CONFIG__ = { apiBaseUrl: ${groovy.json.JsonOutput.toJson(webApiBaseUrl)} };"
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn("generateWebConfig")
+}
+
+if (adbExecutable?.exists()) {
+    tasks.register("reverseLocalPort", Exec) {
+        commandLine adbExecutable.absolutePath, "reverse", "tcp:3000", "tcp:3000"
+        ignoreExitValue true
+    }
+
+    tasks.matching { it.name == "preDebugBuild" }.configureEach {
+        dependsOn("reverseLocalPort")
+    }
+}
