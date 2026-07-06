@@ -234,7 +234,7 @@ function formatStatus(status) {
     REJECTED: "Rejected",
     IN_PROGRESS: "In progress",
     INPROGRESS: "In progress",
-    SUBMITTED_FOR_APPROVAL: "Submitted",
+    SUBMITTED_FOR_APPROVAL: "Submitted for approval",
     CLOSED: "Closed",
     OPEN: "Open",
   };
