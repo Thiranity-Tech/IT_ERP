@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../services/api";
 import Layout from "../components/Layout";
 import { canManagePayroll } from "../constants/roles";
@@ -34,6 +34,7 @@ function Payroll() {
   const [generating, setGenerating] = useState(false);
   const [lastDetails, setLastDetails] = useState(null);
   const setSalaryUsers = users.filter((user) => Number(user.salary || 0) > 0);
+  const baseSalaryFormRef = useRef(null);
 
   const fetchPayroll = useCallback(async () => {
     try {
@@ -154,6 +155,17 @@ function Payroll() {
     }
   };
 
+  const handleEditSavedSalary = (user) => {
+    setSalaryUserId(String(user.id));
+    setBaseSalary(user.salary ?? "");
+    requestAnimationFrame(() => {
+      baseSalaryFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this payroll record?")) return;
 
@@ -196,24 +208,24 @@ function Payroll() {
 
         <section className="stats-grid">
           <div className="stat-card">
-            <div className="label">Payroll Records</div>
+            <div className="label">Payroll Slips</div>
             <div className="value">{summary.payrollCount || 0}</div>
-            <div className="hint">Payslips created</div>
+            <div className="hint">Generated this period</div>
           </div>
           <div className="stat-card">
-            <div className="label">Salary Paid</div>
+            <div className="label">Salary Set</div>
+            <div className="value">{setSalaryUsers.length || 0}</div>
+            <div className="hint">Employees with base salary</div>
+          </div>
+          <div className="stat-card">
+            <div className="label">Pending Setup</div>
+            <div className="value">{Math.max(users.length - setSalaryUsers.length, 0)}</div>
+            <div className="hint">Employees without salary</div>
+          </div>
+          <div className="stat-card">
+            <div className="label">Net Paid</div>
             <div className="value">{currency.format(summary.totalSalaryPaid || 0)}</div>
-            <div className="hint">Net amount released</div>
-          </div>
-          <div className="stat-card">
-            <div className="label">Incentives</div>
-            <div className="value">{currency.format(summary.totalIncentives || 0)}</div>
-            <div className="hint">Approved additions</div>
-          </div>
-          <div className="stat-card">
-            <div className="label">Loss Of Pay</div>
-            <div className="value">{currency.format(summary.totalLossOfPay || 0)}</div>
-            <div className="hint">Salary deductions</div>
+            <div className="hint">Released payroll amount</div>
           </div>
         </section>
 
@@ -299,7 +311,7 @@ function Payroll() {
 
               <div className="workspace-card payroll-work-card">
                 <h3>Set Base Salary</h3>
-                <form className="form-grid" onSubmit={handleSaveBaseSalary}>
+                <form className="form-grid" onSubmit={handleSaveBaseSalary} ref={baseSalaryFormRef}>
                   <label className="field">
                     <span>Employee</span>
                     <select
@@ -352,10 +364,7 @@ function Payroll() {
                       <button
                         className="btn btn-secondary"
                         type="button"
-                        onClick={() => {
-                          setSalaryUserId(String(user.id));
-                          setBaseSalary(user.salary ?? "");
-                        }}
+                        onClick={() => handleEditSavedSalary(user)}
                       >
                         Edit
                       </button>
