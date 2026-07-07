@@ -796,7 +796,42 @@ textarea {
 }
 
 .payroll-grid {
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+}
+
+.payroll-work-card,
+.payroll-records-card {
+  min-width: 0;
+}
+
+.payroll-divider {
+  height: 1px;
+  margin: 22px 0;
+  background: var(--border);
+}
+
+.salary-actions {
+  align-items: center;
+  display: grid;
+  grid-template-columns: 140px auto;
+  gap: 10px;
+}
+
+.salary-actions input {
+  min-width: 0;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.payroll-records-card .erp-table {
+  min-width: 860px;
+}
+
+.payroll-snapshot {
+  margin-bottom: 18px;
 }
 
 @media (max-width: 1180px) {

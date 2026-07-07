@@ -263,88 +263,9 @@ function Payroll() {
           </div>
         </section>
 
-        {canEditPayroll && (
-          <section className="section-grid payroll-grid">
-            <div className="workspace-card">
-              <h3>Role Base Salary Settings</h3>
-              <div className="dashboard-list" style={{ marginBottom: "16px" }}>
-                {roles.map((role) => (
-                  <div className="activity-row" key={role.id}>
-                    <div>
-                      <strong>{role.name}</strong>
-                      <span>Payroll base salary for this role</span>
-                    </div>
-                    <div className="actions" style={{ alignItems: "center" }}>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={roleSalaryDrafts[role.id] ?? ""}
-                        onChange={(e) =>
-                          setRoleSalaryDrafts((current) => ({
-                            ...current,
-                            [role.id]: e.target.value,
-                          }))
-                        }
-                        style={{ width: "140px" }}
-                      />
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        disabled={savingRoleSalaryId === String(role.id)}
-                        onClick={() => handleSaveRoleSalary(role)}
-                      >
-                        {savingRoleSalaryId === String(role.id) ? "Saving..." : "Edit"}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {!roles.length && <div className="empty-state">No roles found.</div>}
-              </div>
-
-              <h3>Employee Base Salary Override</h3>
-              <form className="form-grid" onSubmit={handleSaveBaseSalary}>
-                <label className="field">
-                  <span>Employee</span>
-                  <select
-                    value={salaryUserId}
-                    onChange={(e) => setSalaryUserId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select employee</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.employeeId} - {user.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="field">
-                  <span>Base Salary</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="50000"
-                    value={baseSalary}
-                    onChange={(e) => setBaseSalary(e.target.value)}
-                    required
-                  />
-                  <p className="subtle" style={{ marginTop: "8px" }}>
-                    This override is stored in the employee record and can be used instead of the role salary.
-                  </p>
-                </label>
-
-                <div className="form-actions">
-                  <button className="btn btn-primary" type="submit" disabled={savingSalary || !salaryUserId}>
-                    {savingSalary ? "Saving..." : "Save Base Salary"}
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <div className="workspace-card">
+        <section className="section-grid payroll-grid">
+          {canEditPayroll && (
+            <div className="workspace-card payroll-work-card">
               <h3>Generate Payroll</h3>
               <form className="form-grid" onSubmit={handleGenerate}>
                 <label className="field">
@@ -419,95 +340,173 @@ function Payroll() {
                   </button>
                 </div>
               </form>
-            </div>
 
-            <div className="workspace-card">
-              <h3>Calculation Snapshot</h3>
-              {lastDetails ? (
-                <div className="dashboard-list">
-                  <PayrollMetric label="Base salary" value={currency.format(lastDetails.baseSalary || 0)} />
-                  <PayrollMetric label="Working days" value={lastDetails.workingDays || 0} />
-                  <PayrollMetric label="Present days" value={lastDetails.presentDays || 0} />
-                  <PayrollMetric label="Absent days" value={lastDetails.absentDays || 0} />
-                  <PayrollMetric label="Overtime minutes" value={lastDetails.overtimeMinutes || 0} />
-                  <PayrollMetric
-                    label="Recorded incentives"
-                    value={currency.format(lastDetails.recordedIncentives || 0)}
-                  />
-                </div>
-              ) : (
-                <div className="empty-state">Generate payroll to see the attendance calculation.</div>
-              )}
-            </div>
-          </section>
-        )}
+              <div className="payroll-divider" />
 
-        <div className="table-panel">
-          <table className="erp-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Month</th>
-                <th>Attendance</th>
-                <th>Overtime</th>
-                <th>Incentive</th>
-                <th>Loss Of Pay</th>
-                <th>Final Salary</th>
-                <th>Payslip</th>
-                {canEditPayroll && <th>Actions</th>}
-              </tr>
-            </thead>
-
-            <tbody>
-              {payrolls.map((payroll) => (
-                <tr key={payroll.id}>
-                  <td>
-                    <strong>{payroll.user?.name || "Employee"}</strong>
-                    <span className="table-subtext">
-                      {payroll.user?.employeeId || "-"}
-                      {payroll.user?.designation ? ` | ${payroll.user.designation}` : ""}
-                    </span>
-                  </td>
-                  <td>{payroll.month}</td>
-                  <td>{payroll.attendancePercentage}%</td>
-                  <td>{currency.format(payroll.overtimeAmount || 0)}</td>
-                  <td>{currency.format(payroll.incentiveAmount || 0)}</td>
-                  <td>{currency.format(payroll.lossOfPay || 0)}</td>
-                  <td>
-                    <strong>{currency.format(payroll.finalSalary || 0)}</strong>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-secondary"
-                      onClick={() => handleDownloadPayslip(payroll)}
-                      type="button"
-                    >
-                      Download PDF
-                    </button>
-                  </td>
-                  {canEditPayroll && (
-                    <td>
+              <h3>Role Base Salary Settings</h3>
+              <div className="dashboard-list">
+                {roles.map((role) => (
+                  <div className="activity-row" key={role.id}>
+                    <div>
+                      <strong>{role.name}</strong>
+                      <span>Payroll base salary for this role</span>
+                    </div>
+                    <div className="actions salary-actions">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={roleSalaryDrafts[role.id] ?? ""}
+                        onChange={(e) =>
+                          setRoleSalaryDrafts((current) => ({
+                            ...current,
+                            [role.id]: e.target.value,
+                          }))
+                        }
+                      />
                       <button
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(payroll.id)}
+                        className="btn btn-primary"
                         type="button"
+                        disabled={savingRoleSalaryId === String(role.id)}
+                        onClick={() => handleSaveRoleSalary(role)}
                       >
-                        Delete
+                        {savingRoleSalaryId === String(role.id) ? "Saving..." : "Edit"}
                       </button>
-                    </td>
+                    </div>
+                  </div>
+                ))}
+                {!roles.length && <div className="empty-state">No roles found.</div>}
+              </div>
+
+              <div className="payroll-divider" />
+
+              <h3>Employee Base Salary Override</h3>
+              <form className="form-grid" onSubmit={handleSaveBaseSalary}>
+                <label className="field">
+                  <span>Employee</span>
+                  <select
+                    value={salaryUserId}
+                    onChange={(e) => setSalaryUserId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select employee</option>
+                    {users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.employeeId} - {user.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field">
+                  <span>Base Salary</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="50000"
+                    value={baseSalary}
+                    onChange={(e) => setBaseSalary(e.target.value)}
+                    required
+                  />
+                  <p className="subtle" style={{ marginTop: "8px" }}>
+                    This override is stored in the employee record and can be used instead of the role salary.
+                  </p>
+                </label>
+
+                <div className="form-actions">
+                  <button className="btn btn-primary" type="submit" disabled={savingSalary || !salaryUserId}>
+                    {savingSalary ? "Saving..." : "Save Base Salary"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          <div className="workspace-card payroll-records-card">
+            <h3>Generated Payroll</h3>
+            {lastDetails && (
+              <div className="dashboard-list payroll-snapshot">
+                <PayrollMetric label="Base salary" value={currency.format(lastDetails.baseSalary || 0)} />
+                <PayrollMetric label="Working days" value={lastDetails.workingDays || 0} />
+                <PayrollMetric label="Present days" value={lastDetails.presentDays || 0} />
+                <PayrollMetric label="Absent days" value={lastDetails.absentDays || 0} />
+                <PayrollMetric label="Overtime minutes" value={lastDetails.overtimeMinutes || 0} />
+                <PayrollMetric
+                  label="Recorded incentives"
+                  value={currency.format(lastDetails.recordedIncentives || 0)}
+                />
+              </div>
+            )}
+
+            <div className="table-scroll">
+              <table className="erp-table">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Month</th>
+                    <th>Attendance</th>
+                    <th>Overtime</th>
+                    <th>Incentive</th>
+                    <th>Loss Of Pay</th>
+                    <th>Final Salary</th>
+                    <th>Payslip</th>
+                    {canEditPayroll && <th>Actions</th>}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {payrolls.map((payroll) => (
+                    <tr key={payroll.id}>
+                      <td>
+                        <strong>{payroll.user?.name || "Employee"}</strong>
+                        <span className="table-subtext">
+                          {payroll.user?.employeeId || "-"}
+                          {payroll.user?.designation ? ` | ${payroll.user.designation}` : ""}
+                        </span>
+                      </td>
+                      <td>{payroll.month}</td>
+                      <td>{payroll.attendancePercentage}%</td>
+                      <td>{currency.format(payroll.overtimeAmount || 0)}</td>
+                      <td>{currency.format(payroll.incentiveAmount || 0)}</td>
+                      <td>{currency.format(payroll.lossOfPay || 0)}</td>
+                      <td>
+                        <strong>{currency.format(payroll.finalSalary || 0)}</strong>
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-secondary"
+                          onClick={() => handleDownloadPayslip(payroll)}
+                          type="button"
+                        >
+                          Download PDF
+                        </button>
+                      </td>
+                      {canEditPayroll && (
+                        <td>
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => handleDelete(payroll.id)}
+                            type="button"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                  {!payrolls.length && (
+                    <tr>
+                      <td colSpan={canEditPayroll ? 9 : 8}>
+                        <div className="empty-state">No payroll records found.</div>
+                      </td>
+                    </tr>
                   )}
-                </tr>
-              ))}
-              {!payrolls.length && (
-                <tr>
-                    <td colSpan={canEditPayroll ? 9 : 8}>
-                    <div className="empty-state">No payroll records found.</div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
     </Layout>
   );
