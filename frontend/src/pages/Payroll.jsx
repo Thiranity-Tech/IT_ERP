@@ -198,22 +198,22 @@ function Payroll() {
           <div className="stat-card">
             <div className="label">Payroll Records</div>
             <div className="value">{summary.payrollCount || 0}</div>
-            <div className="hint">Generated payslips</div>
+            <div className="hint">Payslips created</div>
           </div>
           <div className="stat-card">
             <div className="label">Salary Paid</div>
             <div className="value">{currency.format(summary.totalSalaryPaid || 0)}</div>
-            <div className="hint">Total final salary</div>
+            <div className="hint">Net amount released</div>
           </div>
           <div className="stat-card">
             <div className="label">Incentives</div>
             <div className="value">{currency.format(summary.totalIncentives || 0)}</div>
-            <div className="hint">Stored payroll incentive amounts</div>
+            <div className="hint">Approved additions</div>
           </div>
           <div className="stat-card">
             <div className="label">Loss Of Pay</div>
             <div className="value">{currency.format(summary.totalLossOfPay || 0)}</div>
-            <div className="hint">Absence deductions</div>
+            <div className="hint">Salary deductions</div>
           </div>
         </section>
 
