@@ -136,6 +136,7 @@ const createUser = async (req, res) => {
       phone,
       designation,
       salary,
+      baseSalary,
       password,
       roleId,
       teamId,
@@ -160,7 +161,10 @@ const createUser = async (req, res) => {
           email,
           phone: phone || null,
           designation: designation || null,
-          salary: salary === "" || salary === undefined || salary === null ? null : Number(salary),
+          salary:
+            salary === "" || salary === undefined || salary === null
+              ? (baseSalary === "" || baseSalary === undefined || baseSalary === null ? null : Number(baseSalary))
+              : Number(salary),
           password: hashedPassword,
           roleId: numericRoleId,
           teamId: assignment.teamId,
@@ -233,6 +237,7 @@ const updateUser = async (req, res) => {
       phone,
       designation,
       salary,
+      baseSalary,
       roleId,
       teamId,
       departmentId
@@ -270,7 +275,10 @@ const updateUser = async (req, res) => {
           email,
           phone: phone || null,
           designation: designation || null,
-          salary: salary === "" || salary === undefined || salary === null ? null : Number(salary),
+          salary:
+            salary === "" || salary === undefined || salary === null
+              ? (baseSalary === "" || baseSalary === undefined || baseSalary === null ? null : Number(baseSalary))
+              : Number(salary),
           roleId: numericRoleId,
           teamId: assignment.teamId,
           departmentId: assignment.departmentId

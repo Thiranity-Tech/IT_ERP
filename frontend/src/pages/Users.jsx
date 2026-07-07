@@ -96,7 +96,7 @@ function Users() {
               <th>Designation</th>
               <th>Department</th>
               <th>Team</th>
-              <th>Salary</th>
+              <th>Base Salary</th>
               {canEditUsers && <th>Actions</th>}
             </tr>
           </thead>

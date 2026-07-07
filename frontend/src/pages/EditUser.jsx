@@ -16,7 +16,7 @@ function EditUser() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [designation, setDesignation] = useState("");
-  const [salary, setSalary] = useState("");
+  const [baseSalary, setBaseSalary] = useState("");
   const [roleId, setRoleId] = useState("");
   const [teamId, setTeamId] = useState("");
   const [departmentId, setDepartmentId] = useState("");
@@ -31,7 +31,7 @@ function EditUser() {
         setEmail(res.data.email || "");
         setPhone(res.data.phone || "");
         setDesignation(res.data.designation || "");
-        setSalary(res.data.salary ?? "");
+        setBaseSalary(res.data.salary ?? "");
         setRoleId(res.data.roleId || "");
         setTeamId(res.data.teamId || "");
         setDepartmentId(res.data.departmentId || "");
@@ -78,7 +78,7 @@ function EditUser() {
         email,
         phone,
         designation,
-        salary,
+        baseSalary,
         roleId,
         teamId: teamRequired ? teamId : null,
         departmentId: departmentRequired ? departmentId : null,
@@ -148,15 +148,16 @@ function EditUser() {
           </label>
 
           <label className="field">
-            <span>Monthly Salary</span>
+            <span>Base Salary</span>
             <input
               type="number"
               min="0"
               step="0.01"
               placeholder="50000"
-              value={salary}
-              onChange={(e) => setSalary(e.target.value)}
+              value={baseSalary}
+              onChange={(e) => setBaseSalary(e.target.value)}
             />
+            <span className="field-note">Used by payroll when the super admin generates salary records.</span>
           </label>
 
           <label className="field">
