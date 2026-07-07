@@ -23,9 +23,6 @@ function Payroll() {
     averageSalary: 0,
   });
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [roleSalaryDrafts, setRoleSalaryDrafts] = useState({});
-  const [savingRoleSalaryId, setSavingRoleSalaryId] = useState("");
   const [month, setMonth] = useState(currentMonth());
   const [userId, setUserId] = useState("");
   const [salaryUserId, setSalaryUserId] = useState("");
@@ -36,6 +33,7 @@ function Payroll() {
   const [lossOfPay, setLossOfPay] = useState("");
   const [generating, setGenerating] = useState(false);
   const [lastDetails, setLastDetails] = useState(null);
+  const setSalaryUsers = users.filter((user) => Number(user.salary || 0) > 0);
 
   const fetchPayroll = useCallback(async () => {
     try {
@@ -65,23 +63,13 @@ function Payroll() {
   useEffect(() => {
     if (!canEditPayroll) return;
 
-    Promise.all([api.get("/users"), api.get("/roles")])
-      .then(([usersRes, rolesRes]) => {
+    api
+      .get("/users")
+      .then((usersRes) => {
         setUsers(usersRes.data);
-        setRoles(rolesRes.data || []);
 
         if (usersRes.data?.length) {
           setUserId(String(usersRes.data[0].id));
-          setSalaryUserId(String(usersRes.data[0].id));
-          setBaseSalary(usersRes.data[0].salary ?? "");
-        }
-
-        if (rolesRes.data?.length) {
-          setRoleSalaryDrafts(
-            Object.fromEntries(
-              rolesRes.data.map((role) => [role.id, role.baseSalary ?? 0])
-            )
-          );
         }
       })
       .catch((err) => console.error(err));
@@ -155,48 +143,14 @@ function Payroll() {
         )
       );
 
+      setSalaryUserId("");
+      setBaseSalary("");
       alert("Base salary updated successfully");
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.error || "Failed to update base salary");
     } finally {
       setSavingSalary(false);
-    }
-  };
-
-  const handleSaveRoleSalary = async (role) => {
-    const draftValue = roleSalaryDrafts[role.id];
-    const parsedValue = draftValue === "" || draftValue === undefined || draftValue === null ? 0 : Number(draftValue);
-
-    if (Number.isNaN(parsedValue) || parsedValue < 0) {
-      alert("Base salary must be a valid non-negative number");
-      return;
-    }
-
-    try {
-      setSavingRoleSalaryId(String(role.id));
-      const res = await api.put(`/roles/${role.id}/base-salary`, {
-        baseSalary: parsedValue,
-      });
-
-      setRoles((current) =>
-        current.map((item) => (item.id === role.id ? { ...item, baseSalary: res.data.baseSalary } : item))
-      );
-
-      setUsers((current) =>
-        current.map((user) =>
-          Number(user.roleId) === Number(role.id) && !user.salary
-            ? { ...user, salary: res.data.baseSalary }
-            : user
-        )
-      );
-
-      alert(`${role.name} base salary updated successfully`);
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.error || "Failed to update role base salary");
-    } finally {
-      setSavingRoleSalaryId("");
     }
   };
 
@@ -353,7 +307,7 @@ function Payroll() {
                       onChange={(e) => setSalaryUserId(e.target.value)}
                       required
                     >
-                      <option value="">Select employee</option>
+                      <option value="">Select employee to set salary</option>
                       {users.map((user) => (
                         <option key={user.id} value={user.id}>
                           {user.employeeId} - {user.name}
@@ -387,37 +341,28 @@ function Payroll() {
             <section className="workspace-card">
               <h3>Set Salary List</h3>
               <div className="dashboard-list salary-list">
-                {roles.map((role) => (
-                  <div className="activity-row" key={role.id}>
+                {setSalaryUsers.map((user) => (
+                  <div className="activity-row" key={user.id}>
                     <div>
-                      <strong>{role.name}</strong>
-                      <span>{currency.format(role.baseSalary || 0)}</span>
+                      <strong>{user.employeeId} - {user.name}</strong>
+                      <span>{user.role?.name || "Employee"}</span>
                     </div>
-                    <div className="actions salary-actions">
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={roleSalaryDrafts[role.id] ?? ""}
-                        onChange={(e) =>
-                          setRoleSalaryDrafts((current) => ({
-                            ...current,
-                            [role.id]: e.target.value,
-                          }))
-                        }
-                      />
+                    <div className="actions">
+                      <span className="pill pill-green">{currency.format(user.salary || 0)}</span>
                       <button
-                        className="btn btn-primary"
+                        className="btn btn-secondary"
                         type="button"
-                        disabled={savingRoleSalaryId === String(role.id)}
-                        onClick={() => handleSaveRoleSalary(role)}
+                        onClick={() => {
+                          setSalaryUserId(String(user.id));
+                          setBaseSalary(user.salary ?? "");
+                        }}
                       >
-                        {savingRoleSalaryId === String(role.id) ? "Saving..." : "Edit"}
+                        Edit
                       </button>
                     </div>
                   </div>
                 ))}
-                {!roles.length && <div className="empty-state">No salaries set yet.</div>}
+                {!setSalaryUsers.length && <div className="empty-state">No base salaries set yet.</div>}
               </div>
             </section>
           </>
