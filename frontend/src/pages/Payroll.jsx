@@ -25,6 +25,9 @@ function Payroll() {
   const [users, setUsers] = useState([]);
   const [month, setMonth] = useState(currentMonth());
   const [userId, setUserId] = useState("");
+  const [salaryUserId, setSalaryUserId] = useState("");
+  const [baseSalary, setBaseSalary] = useState("");
+  const [savingSalary, setSavingSalary] = useState(false);
   const [overtimeAmount, setOvertimeAmount] = useState("");
   const [incentiveAmount, setIncentiveAmount] = useState("");
   const [lossOfPay, setLossOfPay] = useState("");
@@ -63,10 +66,24 @@ function Payroll() {
       .get("/users")
       .then((res) => {
         setUsers(res.data);
-        if (res.data?.length) setUserId(String(res.data[0].id));
+        if (res.data?.length) {
+          setUserId(String(res.data[0].id));
+          setSalaryUserId(String(res.data[0].id));
+          setBaseSalary(res.data[0].salary ?? "");
+        }
       })
       .catch((err) => console.error(err));
   }, [canEditPayroll]);
+
+  useEffect(() => {
+    if (!salaryUserId) {
+      setBaseSalary("");
+      return;
+    }
+
+    const selectedUser = users.find((user) => String(user.id) === String(salaryUserId));
+    setBaseSalary(selectedUser?.salary ?? "");
+  }, [salaryUserId, users]);
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -94,6 +111,44 @@ function Payroll() {
       alert(err.response?.data?.error || "Failed to generate payroll");
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleSaveBaseSalary = async (e) => {
+    e.preventDefault();
+
+    if (!salaryUserId) return;
+
+    const selectedUser = users.find((user) => String(user.id) === String(salaryUserId));
+    if (!selectedUser) return;
+
+    try {
+      setSavingSalary(true);
+      const res = await api.put(`/users/${salaryUserId}`, {
+        name: selectedUser.name,
+        email: selectedUser.email,
+        phone: selectedUser.phone || "",
+        designation: selectedUser.designation || "",
+        baseSalary,
+        roleId: selectedUser.roleId,
+        teamId: selectedUser.teamId || null,
+        departmentId: selectedUser.departmentId || null,
+      });
+
+      setUsers((current) =>
+        current.map((user) =>
+          String(user.id) === String(salaryUserId)
+            ? { ...user, salary: res.data.salary ?? baseSalary }
+            : user
+        )
+      );
+
+      alert("Base salary updated successfully");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || "Failed to update base salary");
+    } finally {
+      setSavingSalary(false);
     }
   };
 
@@ -162,6 +217,49 @@ function Payroll() {
 
         {canEditPayroll && (
           <section className="section-grid payroll-grid">
+            <div className="workspace-card">
+              <h3>Base Salary Settings</h3>
+              <form className="form-grid" onSubmit={handleSaveBaseSalary}>
+                <label className="field">
+                  <span>Employee</span>
+                  <select
+                    value={salaryUserId}
+                    onChange={(e) => setSalaryUserId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select employee</option>
+                    {users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.employeeId} - {user.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field">
+                  <span>Base Salary</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="50000"
+                    value={baseSalary}
+                    onChange={(e) => setBaseSalary(e.target.value)}
+                    required
+                  />
+                  <p className="subtle" style={{ marginTop: "8px" }}>
+                    This value is stored in the employee record and used when payroll is generated.
+                  </p>
+                </label>
+
+                <div className="form-actions">
+                  <button className="btn btn-primary" type="submit" disabled={savingSalary || !salaryUserId}>
+                    {savingSalary ? "Saving..." : "Save Base Salary"}
+                  </button>
+                </div>
+              </form>
+            </div>
+
             <div className="workspace-card">
               <h3>Generate Payroll</h3>
               <form className="form-grid" onSubmit={handleGenerate}>
