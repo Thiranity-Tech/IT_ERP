@@ -151,7 +151,7 @@ const ensureUserInScope = async (req, userId) => {
 };
 
 const ensureBaseSalary = (user) => {
-  const baseSalary = roundMoney(user?.salary || 0);
+  const baseSalary = roundMoney(user?.salary ?? user?.role?.baseSalary ?? 0);
   if (baseSalary <= 0) {
     const error = new Error("Employee salary must be set by the super admin before generating payroll.");
     error.status = 400;

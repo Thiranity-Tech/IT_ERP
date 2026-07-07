@@ -23,6 +23,9 @@ function Payroll() {
     averageSalary: 0,
   });
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [roleSalaryDrafts, setRoleSalaryDrafts] = useState({});
+  const [savingRoleSalaryId, setSavingRoleSalaryId] = useState("");
   const [month, setMonth] = useState(currentMonth());
   const [userId, setUserId] = useState("");
   const [salaryUserId, setSalaryUserId] = useState("");
@@ -62,14 +65,23 @@ function Payroll() {
   useEffect(() => {
     if (!canEditPayroll) return;
 
-    api
-      .get("/users")
-      .then((res) => {
-        setUsers(res.data);
-        if (res.data?.length) {
-          setUserId(String(res.data[0].id));
-          setSalaryUserId(String(res.data[0].id));
-          setBaseSalary(res.data[0].salary ?? "");
+    Promise.all([api.get("/users"), api.get("/roles")])
+      .then(([usersRes, rolesRes]) => {
+        setUsers(usersRes.data);
+        setRoles(rolesRes.data || []);
+
+        if (usersRes.data?.length) {
+          setUserId(String(usersRes.data[0].id));
+          setSalaryUserId(String(usersRes.data[0].id));
+          setBaseSalary(usersRes.data[0].salary ?? "");
+        }
+
+        if (rolesRes.data?.length) {
+          setRoleSalaryDrafts(
+            Object.fromEntries(
+              rolesRes.data.map((role) => [role.id, role.baseSalary ?? 0])
+            )
+          );
         }
       })
       .catch((err) => console.error(err));
@@ -152,6 +164,42 @@ function Payroll() {
     }
   };
 
+  const handleSaveRoleSalary = async (role) => {
+    const draftValue = roleSalaryDrafts[role.id];
+    const parsedValue = draftValue === "" || draftValue === undefined || draftValue === null ? 0 : Number(draftValue);
+
+    if (Number.isNaN(parsedValue) || parsedValue < 0) {
+      alert("Base salary must be a valid non-negative number");
+      return;
+    }
+
+    try {
+      setSavingRoleSalaryId(String(role.id));
+      const res = await api.put(`/roles/${role.id}/base-salary`, {
+        baseSalary: parsedValue,
+      });
+
+      setRoles((current) =>
+        current.map((item) => (item.id === role.id ? { ...item, baseSalary: res.data.baseSalary } : item))
+      );
+
+      setUsers((current) =>
+        current.map((user) =>
+          Number(user.roleId) === Number(role.id) && !user.salary
+            ? { ...user, salary: res.data.baseSalary }
+            : user
+        )
+      );
+
+      alert(`${role.name} base salary updated successfully`);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || "Failed to update role base salary");
+    } finally {
+      setSavingRoleSalaryId("");
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this payroll record?")) return;
 
@@ -218,7 +266,43 @@ function Payroll() {
         {canEditPayroll && (
           <section className="section-grid payroll-grid">
             <div className="workspace-card">
-              <h3>Base Salary Settings</h3>
+              <h3>Role Base Salary Settings</h3>
+              <div className="dashboard-list" style={{ marginBottom: "16px" }}>
+                {roles.map((role) => (
+                  <div className="activity-row" key={role.id}>
+                    <div>
+                      <strong>{role.name}</strong>
+                      <span>Payroll base salary for this role</span>
+                    </div>
+                    <div className="actions" style={{ alignItems: "center" }}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={roleSalaryDrafts[role.id] ?? ""}
+                        onChange={(e) =>
+                          setRoleSalaryDrafts((current) => ({
+                            ...current,
+                            [role.id]: e.target.value,
+                          }))
+                        }
+                        style={{ width: "140px" }}
+                      />
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        disabled={savingRoleSalaryId === String(role.id)}
+                        onClick={() => handleSaveRoleSalary(role)}
+                      >
+                        {savingRoleSalaryId === String(role.id) ? "Saving..." : "Edit"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {!roles.length && <div className="empty-state">No roles found.</div>}
+              </div>
+
+              <h3>Employee Base Salary Override</h3>
               <form className="form-grid" onSubmit={handleSaveBaseSalary}>
                 <label className="field">
                   <span>Employee</span>
@@ -248,7 +332,7 @@ function Payroll() {
                     required
                   />
                   <p className="subtle" style={{ marginTop: "8px" }}>
-                    This value is stored in the employee record and used when payroll is generated.
+                    This override is stored in the employee record and can be used instead of the role salary.
                   </p>
                 </label>
 
