@@ -263,93 +263,135 @@ function Payroll() {
           </div>
         </section>
 
-        <section className="section-grid payroll-grid">
-          {canEditPayroll && (
-            <div className="workspace-card payroll-work-card">
-              <h3>Generate Payroll</h3>
-              <form className="form-grid" onSubmit={handleGenerate}>
-                <label className="field">
-                  <span>Month</span>
-                  <input
-                    type="month"
-                    value={month}
-                    onChange={(e) => setMonth(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Employee</span>
-                  <select
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select employee</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.employeeId} - {user.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <div className="form-row">
+        {canEditPayroll && (
+          <>
+            <section className="section-grid payroll-grid">
+              <div className="workspace-card payroll-work-card">
+                <h3>Generate Payroll</h3>
+                <form className="form-grid" onSubmit={handleGenerate}>
                   <label className="field">
-                    <span>Overtime Override</span>
+                    <span>Month</span>
+                    <input
+                      type="month"
+                      value={month}
+                      onChange={(e) => setMonth(e.target.value)}
+                      required
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Employee</span>
+                    <select
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      required
+                    >
+                      <option value="">Select employee</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.employeeId} - {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <div className="form-row">
+                    <label className="field">
+                      <span>Overtime Override</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Auto"
+                        value={overtimeAmount}
+                        onChange={(e) => setOvertimeAmount(e.target.value)}
+                      />
+                    </label>
+                    <label className="field">
+                      <span>Manual Payroll Incentive</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Only if added"
+                        value={incentiveAmount}
+                        onChange={(e) => setIncentiveAmount(e.target.value)}
+                      />
+                    </label>
+                    <label className="field">
+                      <span>Loss Of Pay Override</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Auto"
+                        value={lossOfPay}
+                        onChange={(e) => setLossOfPay(e.target.value)}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="form-actions">
+                    <button
+                      className="btn btn-primary"
+                      disabled={generating || !userId}
+                      type="submit"
+                    >
+                      {generating ? "Generating..." : "Generate Payroll"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="workspace-card payroll-work-card">
+                <h3>Set Base Salary</h3>
+                <form className="form-grid" onSubmit={handleSaveBaseSalary}>
+                  <label className="field">
+                    <span>Employee</span>
+                    <select
+                      value={salaryUserId}
+                      onChange={(e) => setSalaryUserId(e.target.value)}
+                      required
+                    >
+                      <option value="">Select employee</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.employeeId} - {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>Base Salary</span>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      placeholder="Auto"
-                      value={overtimeAmount}
-                      onChange={(e) => setOvertimeAmount(e.target.value)}
+                      placeholder="50000"
+                      value={baseSalary}
+                      onChange={(e) => setBaseSalary(e.target.value)}
+                      required
                     />
                   </label>
-                  <label className="field">
-                    <span>Manual Payroll Incentive</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="Only if added"
-                      value={incentiveAmount}
-                      onChange={(e) => setIncentiveAmount(e.target.value)}
-                    />
-                  </label>
-                  <label className="field">
-                    <span>Loss Of Pay Override</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="Auto"
-                      value={lossOfPay}
-                      onChange={(e) => setLossOfPay(e.target.value)}
-                    />
-                  </label>
-                </div>
 
-                <div className="form-actions">
-                  <button
-                    className="btn btn-primary"
-                    disabled={generating || !userId}
-                    type="submit"
-                  >
-                    {generating ? "Generating..." : "Generate Payroll"}
-                  </button>
-                </div>
-              </form>
+                  <div className="form-actions">
+                    <button className="btn btn-primary" type="submit" disabled={savingSalary || !salaryUserId}>
+                      {savingSalary ? "Saving..." : "Save Base Salary"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </section>
 
-              <div className="payroll-divider" />
-
-              <h3>Role Base Salary Settings</h3>
-              <div className="dashboard-list">
+            <section className="workspace-card">
+              <h3>Set Salary List</h3>
+              <div className="dashboard-list salary-list">
                 {roles.map((role) => (
                   <div className="activity-row" key={role.id}>
                     <div>
                       <strong>{role.name}</strong>
-                      <span>Payroll base salary for this role</span>
+                      <span>{currency.format(role.baseSalary || 0)}</span>
                     </div>
                     <div className="actions salary-actions">
                       <input
@@ -375,56 +417,14 @@ function Payroll() {
                     </div>
                   </div>
                 ))}
-                {!roles.length && <div className="empty-state">No roles found.</div>}
+                {!roles.length && <div className="empty-state">No salaries set yet.</div>}
               </div>
+            </section>
+          </>
+        )}
 
-              <div className="payroll-divider" />
-
-              <h3>Employee Base Salary Override</h3>
-              <form className="form-grid" onSubmit={handleSaveBaseSalary}>
-                <label className="field">
-                  <span>Employee</span>
-                  <select
-                    value={salaryUserId}
-                    onChange={(e) => setSalaryUserId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select employee</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.employeeId} - {user.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="field">
-                  <span>Base Salary</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="50000"
-                    value={baseSalary}
-                    onChange={(e) => setBaseSalary(e.target.value)}
-                    required
-                  />
-                  <p className="subtle" style={{ marginTop: "8px" }}>
-                    This override is stored in the employee record and can be used instead of the role salary.
-                  </p>
-                </label>
-
-                <div className="form-actions">
-                  <button className="btn btn-primary" type="submit" disabled={savingSalary || !salaryUserId}>
-                    {savingSalary ? "Saving..." : "Save Base Salary"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          <div className="workspace-card payroll-records-card">
-            <h3>Generated Payroll</h3>
+        <section className="workspace-card payroll-records-card">
+          <h3>Generated Salary</h3>
             {lastDetails && (
               <div className="dashboard-list payroll-snapshot">
                 <PayrollMetric label="Base salary" value={currency.format(lastDetails.baseSalary || 0)} />
@@ -505,7 +505,6 @@ function Payroll() {
                 </tbody>
               </table>
             </div>
-          </div>
         </section>
       </div>
     </Layout>

@@ -796,7 +796,7 @@ textarea {
 }
 
 .payroll-grid {
-  grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
 }
 
@@ -832,6 +832,10 @@ textarea {
 
 .payroll-snapshot {
   margin-bottom: 18px;
+}
+
+.salary-list .activity-row {
+  align-items: center;
 }
 
 @media (max-width: 1180px) {
