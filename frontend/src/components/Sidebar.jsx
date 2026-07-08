@@ -11,6 +11,7 @@ import {
   FiLogOut,
   FiPieChart,
   FiUsers,
+  FiSettings,
 } from "react-icons/fi";
 import { ROLES } from "../constants/roles";
 
@@ -29,6 +30,7 @@ const navGroups = [
       { to: "/projects", label: "Projects", icon: FiBriefcase },
       { to: "/tasks", label: "Tasks", icon: FiActivity },
       { to: "/attendance", label: "Attendance", icon: FiCalendar },
+      { to: "/attendance-settings", label: "Attendance Timing", icon: FiSettings, minRole: ROLES.ADMIN, maxRole: ROLES.ADMIN },
       { to: "/leave-requests", label: "Leave Requests", icon: FiLayers },
       { to: "/payroll", label: "Payroll", icon: FiCreditCard },
       { to: "/notifications", label: "Notifications", icon: FiBell },
@@ -60,7 +62,9 @@ function Sidebar({ open, onClose }) {
           ? `${departmentName} department`
           : "Personal workspace";
 
-  const canSee = (item) => !item.minRole || roleId >= item.minRole;
+  const canSee = (item) =>
+    (!item.minRole || roleId >= item.minRole) &&
+    (!item.maxRole || roleId <= item.maxRole);
 
   const logout = () => {
     localStorage.clear();

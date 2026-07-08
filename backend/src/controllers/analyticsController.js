@@ -783,6 +783,10 @@ const getEmployeeAnalytics = async (req, res) => {
         id: employee.id,
         employeeId: employee.employeeId,
         name: employee.name,
+        email: employee.email,
+        phone: employee.phone,
+        designation: employee.designation,
+        salary: employee.salary,
         role: employee.role?.name,
         department: employee.department?.name || employee.team?.department?.name || "-",
         team: employee.team?.name || "-"

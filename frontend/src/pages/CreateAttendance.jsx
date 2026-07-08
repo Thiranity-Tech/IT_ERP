@@ -5,14 +5,10 @@ import Layout from "../components/Layout";
 
 function CreateAttendance() {
   const navigate = useNavigate();
-
   const [users, setUsers] = useState([]);
-
   const [date, setDate] = useState("");
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [lateMinutes, setLateMinutes] = useState(0);
-  const [overtimeMinutes, setOvertimeMinutes] = useState(0);
   const [userId, setUserId] = useState("");
 
   useEffect(() => {
@@ -25,7 +21,7 @@ function CreateAttendance() {
       }
     };
 
-    fetchUsers();
+    void fetchUsers();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -36,93 +32,92 @@ function CreateAttendance() {
         date,
         checkIn,
         checkOut,
-        lateMinutes: Number(lateMinutes),
-        overtimeMinutes: Number(overtimeMinutes),
-        userId: Number(userId),
+        userId: Number(userId)
       });
 
       alert("Attendance created successfully");
       navigate("/attendance");
     } catch (err) {
       console.error(err);
-      alert("Failed to create attendance");
+      alert(err.response?.data?.error || "Failed to create attendance");
     }
   };
 
   return (
     <Layout>
-      <h1>Create Attendance</h1>
+      <div className="dashboard-page">
+        <section className="dashboard-hero">
+          <div>
+            <span className="hero-note">Attendance entry</span>
+            <h1>Create Attendance</h1>
+            <p>Manually record a daily attendance entry for a user. Late and overtime can still be captured here if needed.</p>
+          </div>
+          <div className="hero-note">Manual entry</div>
+        </section>
 
-      <form onSubmit={handleSubmit}>
-        <select
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          required
-        >
-          <option value="">Select Employee</option>
+        <section className="workspace-card">
+          <div className="card-header">
+            <div>
+              <span className="card-kicker">Attendance</span>
+              <h3>New record</h3>
+            </div>
+          </div>
 
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.employeeId} - {u.name}
-            </option>
-          ))}
-        </select>
+          <form className="form-grid" onSubmit={handleSubmit}>
+            <div className="form-row">
+              <label className="field">
+                <span>Employee</span>
+                <select value={userId} onChange={(e) => setUserId(e.target.value)} required>
+                  <option value="">Select employee</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.employeeId} - {u.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-        <br /><br />
+              <label className="field">
+                <span>Date</span>
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+              </label>
+            </div>
 
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
+            <div className="form-row">
+              <label className="field">
+                <span>Check In</span>
+                <input
+                  type="datetime-local"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                />
+              </label>
 
-        <br /><br />
+              <label className="field">
+                <span>Check Out</span>
+                <input
+                  type="datetime-local"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                />
+              </label>
+            </div>
 
-        <label>Check In</label>
-        <br />
+            <div className="empty-state">
+              Late arrival and overtime are calculated automatically from the Admin attendance timing settings.
+            </div>
 
-        <input
-          type="datetime-local"
-          value={checkIn}
-          onChange={(e) => setCheckIn(e.target.value)}
-        />
-
-        <br /><br />
-
-        <label>Check Out</label>
-        <br />
-
-        <input
-          type="datetime-local"
-          value={checkOut}
-          onChange={(e) => setCheckOut(e.target.value)}
-        />
-
-        <br /><br />
-
-        <input
-          type="number"
-          placeholder="Late Minutes"
-          value={lateMinutes}
-          onChange={(e) => setLateMinutes(e.target.value)}
-        />
-
-        <br /><br />
-
-        <input
-          type="number"
-          placeholder="Overtime Minutes"
-          value={overtimeMinutes}
-          onChange={(e) => setOvertimeMinutes(e.target.value)}
-        />
-
-        <br /><br />
-
-        <button type="submit">
-          Create Attendance
-        </button>
-      </form>
+            <div className="form-actions">
+              <button className="btn btn-secondary" type="button" onClick={() => navigate("/attendance")}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" type="submit">
+                Create Attendance
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
     </Layout>
   );
 }

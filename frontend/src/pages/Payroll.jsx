@@ -200,33 +200,37 @@ function Payroll() {
   return (
     <Layout>
       <div className="dashboard-page">
-        <div className="table-toolbar">
-          <div>
+        <section className="dashboard-hero">
+          <div className="dashboard-hero-copy">
+            <span className="hero-note">Finance workspace</span>
             <h1>Payroll</h1>
-            <p className="subtle">
-              Payslips, overtime, manual payroll incentives, and loss-of-pay for the current workspace.
-            </p>
+            <p>Payslips, salary setup, overtime, incentives, and loss-of-pay for the current workspace.</p>
           </div>
-        </div>
+          <div className="dashboard-hero-rail">
+            <span className="hero-note">Payroll data</span>
+            <strong>{summary.payrollCount || 0} records</strong>
+            <small>{currency.format(summary.totalSalaryPaid || 0)} paid</small>
+          </div>
+        </section>
 
         <section className="stats-grid">
           <div className="stat-card">
-            <div className="label">Payroll Slips</div>
+            <div className="label">Payroll slips</div>
             <div className="value">{summary.payrollCount || 0}</div>
             <div className="hint">Generated this period</div>
           </div>
           <div className="stat-card">
-            <div className="label">Net Paid</div>
+            <div className="label">Net paid</div>
             <div className="value">{currency.format(summary.totalSalaryPaid || 0)}</div>
             <div className="hint">Released payroll amount</div>
           </div>
           <div className="stat-card">
-            <div className="label">Base Salaries</div>
+            <div className="label">Base salaries</div>
             <div className="value">{setSalaryUsers.length || 0}</div>
             <div className="hint">Employees already configured</div>
           </div>
           <div className="stat-card">
-            <div className="label">Pending Setup</div>
+            <div className="label">Pending setup</div>
             <div className="value">{Math.max(users.length - setSalaryUsers.length, 0)}</div>
             <div className="hint">Employees still to configure</div>
           </div>
@@ -236,7 +240,16 @@ function Payroll() {
           <>
             <section className="section-grid payroll-grid">
               <div className="workspace-card payroll-work-card">
-                <h3>Generate Payroll</h3>
+                <div className="card-header">
+                  <div>
+                    <span className="card-kicker">Generate</span>
+                    <h3>Generate payroll</h3>
+                  </div>
+                </div>
+                <div className="lookup-helper">
+                  Overtime is calculated from attendance in minutes and converted into money.
+                  Loss of pay is stored as a money amount.
+                </div>
                 <form className="form-grid" onSubmit={handleGenerate}>
                   <label className="field">
                     <span>Month</span>
@@ -266,18 +279,18 @@ function Payroll() {
 
                   <div className="form-row">
                     <label className="field">
-                      <span>Overtime Override</span>
+                      <span>Overtime amount (INR)</span>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        placeholder="Auto"
+                        placeholder="Auto-calculated amount"
                         value={overtimeAmount}
                         onChange={(e) => setOvertimeAmount(e.target.value)}
                       />
                     </label>
                     <label className="field">
-                      <span>Manual Payroll Incentive</span>
+                      <span>Payroll incentive (INR)</span>
                       <input
                         type="number"
                         min="0"
@@ -288,12 +301,12 @@ function Payroll() {
                       />
                     </label>
                     <label className="field">
-                      <span>Loss Of Pay Override</span>
+                      <span>Loss of pay (INR)</span>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        placeholder="Auto"
+                        placeholder="Auto-calculated amount"
                         value={lossOfPay}
                         onChange={(e) => setLossOfPay(e.target.value)}
                       />
@@ -313,7 +326,12 @@ function Payroll() {
               </div>
 
               <div className="workspace-card payroll-work-card" ref={baseSalaryCardRef}>
-                <h3>Set Base Salary</h3>
+                <div className="card-header">
+                  <div>
+                    <span className="card-kicker">Setup</span>
+                    <h3>Set base salary</h3>
+                  </div>
+                </div>
                 <form className="form-grid" onSubmit={handleSaveBaseSalary}>
                   <label className="field">
                     <span>Employee</span>
@@ -354,7 +372,12 @@ function Payroll() {
             </section>
 
             <section className="workspace-card">
-              <h3>Set Salary List</h3>
+              <div className="card-header">
+                <div>
+                  <span className="card-kicker">Configured</span>
+                  <h3>Base salary list</h3>
+                </div>
+              </div>
               <div className="dashboard-list salary-list">
                 {setSalaryUsers.map((user) => (
                   <div className="activity-row" key={user.id}>
@@ -381,7 +404,13 @@ function Payroll() {
         )}
 
         <section className="workspace-card payroll-records-card">
-          <h3>Generated Salary</h3>
+          <div className="card-header">
+            <div>
+              <span className="card-kicker">Records</span>
+              <h3>Generated salary</h3>
+            </div>
+            <span className="card-count">{payrolls.length}</span>
+          </div>
             <div className="table-scroll">
               <table className="erp-table">
                 <thead>
@@ -391,7 +420,7 @@ function Payroll() {
                     <th>Attendance</th>
                     <th>Overtime</th>
                     <th>Incentive</th>
-                    <th>Loss Of Pay</th>
+                    <th>Loss of pay</th>
                     <th>Final Salary</th>
                     <th>Payslip</th>
                     {canEditPayroll && <th>Actions</th>}

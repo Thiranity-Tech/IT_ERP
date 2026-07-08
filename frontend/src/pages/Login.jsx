@@ -38,22 +38,34 @@ function Login() {
 
   return (
     <div className="auth-shell">
-      <section className="auth-hero" aria-hidden="true" />
-
       <section className="auth-panel">
         <div className="login-panel">
-          <div className="login-logo">IE</div>
+          <div className="login-heading">
+            <span className="login-kicker">Company workspace</span>
+            <div className="login-title-row">
+              <div className="login-logo">IE</div>
+              <div>
+                <h1>IT ERP</h1>
+                <p>Internal operations suite for employees, managers, and admins.</p>
+              </div>
+            </div>
+            <div className="login-meta">
+              <span className="meta-chip">Secure sign-in</span>
+              <span className="meta-chip">Role-based access</span>
+              <span className="meta-chip">Payroll and HR workflow</span>
+            </div>
+          </div>
           <div className="panel-heading">
             <h1>Sign in</h1>
-            <p>Use your employee ID and password to sign in.</p>
+            <p>Use your company username and password to continue.</p>
           </div>
 
           <form className="form-grid" onSubmit={handleLogin}>
             <label className="field">
-              <span>Employee ID</span>
+              <span>Username</span>
               <input
                 type="text"
-                placeholder="SA001"
+                placeholder="Enter Username"
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 required

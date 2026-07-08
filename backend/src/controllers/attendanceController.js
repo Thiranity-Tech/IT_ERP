@@ -103,6 +103,59 @@ const parseDateCell = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
+const getRowValue = (row, key) => {
+  if (!row || typeof row !== "object") return undefined;
+
+  const direct = row[key];
+  if (direct !== undefined && direct !== null && String(direct).trim() !== "") {
+    return direct;
+  }
+
+  const lowerKey = String(key || "").toLowerCase();
+  const matchKey = Object.keys(row).find((currentKey) => String(currentKey).toLowerCase() === lowerKey);
+  if (!matchKey) return undefined;
+
+  const value = row[matchKey];
+  return value === undefined || value === null || String(value).trim() === "" ? undefined : value;
+};
+
+const normalizeHeader = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_\-]+/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
+const REQUIRED_ATTENDANCE_HEADERS = [
+  "employeeid",
+  "date",
+  "checkin",
+  "checkout"
+];
+
+const findAttendanceHeaderRow = (sheetRows) => {
+  if (!Array.isArray(sheetRows)) return { headerIndex: -1, headers: [] };
+
+  for (let index = 0; index < sheetRows.length; index += 1) {
+    const row = sheetRows[index];
+    if (!Array.isArray(row)) continue;
+
+    const normalized = row.map(normalizeHeader);
+    const hasRequiredHeaders = REQUIRED_ATTENDANCE_HEADERS.every((header) =>
+      normalized.includes(header)
+    );
+
+    if (hasRequiredHeaders) {
+      return {
+        headerIndex: index,
+        headers: normalized
+      };
+    }
+  }
+
+  return { headerIndex: -1, headers: [] };
+};
+
 const getOfficeTiming = async () => {
   const officeSetting = await prisma.officeSetting.findFirst();
 
@@ -395,14 +448,47 @@ const uploadAttendanceExcel = async (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
-    const rows = XLSX.utils.sheet_to_json(sheet);
+    const sheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+    const { headerIndex, headers } = findAttendanceHeaderRow(sheetRows);
+    const dataRows = headerIndex >= 0 ? sheetRows.slice(headerIndex + 1) : sheetRows.slice(1);
+    const rows = dataRows
+      .filter((row) => Array.isArray(row) && row.some((cell) => String(cell || "").trim() !== ""))
+      .map((row) =>
+        headers.reduce((memo, header, index) => {
+          if (!header) return memo;
+          memo[header] = row[index];
+          return memo;
+        }, {})
+      );
 
     const { officeStartTime, officeEndTime, graceMinutes } = await getOfficeTiming();
+    const summary = {
+      processed: rows.length,
+      saved: 0,
+      skipped: 0,
+      skippedMissingEmployeeId: 0,
+      skippedUnknownEmployee: 0,
+      skippedOutOfScope: 0,
+      skippedInvalidDate: 0,
+      skippedExisting: 0
+    };
 
     for (const row of rows) {
+      const employeeId = String(
+        getRowValue(row, "employeeId") ||
+        getRowValue(row, "employeeid") ||
+        getRowValue(row, "employee id") ||
+        ""
+      ).trim();
+      if (!employeeId) {
+        summary.skipped += 1;
+        summary.skippedMissingEmployeeId += 1;
+        continue;
+      }
+
       const user = await prisma.user.findUnique({
         where: {
-          employeeId: row.employeeId,
+          employeeId,
         },
         select: {
           id: true,
@@ -415,11 +501,27 @@ const uploadAttendanceExcel = async (req, res) => {
         }
       });
 
-      if (!user) continue;
-      if (!(await canManageAttendanceForUser(req, user.id))) continue;
+      if (!user) {
+        summary.skipped += 1;
+        summary.skippedUnknownEmployee += 1;
+        continue;
+      }
+      if (!(await canManageAttendanceForUser(req, user.id))) {
+        summary.skipped += 1;
+        summary.skippedOutOfScope += 1;
+        continue;
+      }
 
-      const parsedDate = parseDateCell(row.date);
-      if (!parsedDate) continue;
+      const parsedDate = parseDateCell(
+        getRowValue(row, "date") ||
+        getRowValue(row, "attendance date") ||
+        getRowValue(row, "day")
+      );
+      if (!parsedDate) {
+        summary.skipped += 1;
+        summary.skippedInvalidDate += 1;
+        continue;
+      }
 
       const formattedDate = new Date(
         Date.UTC(
@@ -437,10 +539,25 @@ const uploadAttendanceExcel = async (req, res) => {
           },
         });
 
-      if (existingAttendance) continue;
+      if (existingAttendance) {
+        summary.skipped += 1;
+        summary.skippedExisting += 1;
+        continue;
+      }
 
-      const checkIn = parseDateCell(row.checkIn);
-      const checkOut = parseDateCell(row.checkOut);
+      const checkIn = parseDateCell(
+        getRowValue(row, "checkIn") ||
+        getRowValue(row, "checkin") ||
+        getRowValue(row, "in") ||
+        getRowValue(row, "in time")
+      );
+      const checkOut = parseDateCell(
+        getRowValue(row, "checkOut") ||
+        getRowValue(row, "checkout") ||
+        getRowValue(row, "out") ||
+        getRowValue(row, "out time")
+      );
+      const remarks = getRowValue(row, "remarks") || getRowValue(row, "note") || null;
 
       const metrics = calculateAttendanceMetrics({
         date: formattedDate,
@@ -460,14 +577,17 @@ const uploadAttendanceExcel = async (req, res) => {
           lateMinutes: metrics.lateMinutes,
           overtimeMinutes: metrics.overtimeMinutes,
           status: metrics.status,
-          remarks: null,
+          remarks,
           userId: user.id,
         },
       });
+
+      summary.saved += 1;
     }
 
     res.json({
       message: "Attendance uploaded successfully",
+      summary
     });
   } catch (error) {
     res.status(500).json({

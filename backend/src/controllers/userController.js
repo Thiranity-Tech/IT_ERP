@@ -402,6 +402,11 @@ const searchUsers = async (req, res) => {
   try {
     const { q } = req.query;
     const scope = await getUserScope(req);
+    const query = String(q || "").trim();
+
+    if (!query) {
+      return res.json([]);
+    }
 
     const users = await prisma.user.findMany({
       where: {
@@ -411,12 +416,32 @@ const searchUsers = async (req, res) => {
             OR: [
               {
                 name: {
-                  contains: q
+                  contains: query,
+                  mode: "insensitive"
                 }
               },
               {
                 email: {
-                  contains: q
+                  contains: query,
+                  mode: "insensitive"
+                }
+              },
+              {
+                employeeId: {
+                  contains: query,
+                  mode: "insensitive"
+                }
+              },
+              {
+                phone: {
+                  contains: query,
+                  mode: "insensitive"
+                }
+              },
+              {
+                designation: {
+                  contains: query,
+                  mode: "insensitive"
                 }
               }
             ]

@@ -13,29 +13,28 @@ function EditTask() {
   const [deadline, setDeadline] = useState("");
   const [projectId, setProjectId] = useState("");
   const [userId, setUserId] = useState("");
-
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    api.get(`/tasks/${id}`).then((res) => {
+    const loadTask = async () => {
+      const res = await api.get(`/tasks/${id}`);
       setTitle(res.data.title);
       setDescription(res.data.description || "");
       setStatus(res.data.status);
-      setDeadline(
-        res.data.deadline.split("T")[0]
-      );
-      setProjectId(res.data.projectId);
-      setUserId(res.data.userId);
-    });
+      setDeadline(res.data.deadline?.split("T")[0] || "");
+      setProjectId(String(res.data.projectId || ""));
+      setUserId(String(res.data.userId || ""));
+    };
 
-    api.get("/projects").then((res) =>
-      setProjects(res.data)
-    );
+    const loadLists = async () => {
+      const [projectsRes, usersRes] = await Promise.all([api.get("/projects"), api.get("/users")]);
+      setProjects(projectsRes.data);
+      setUsers(usersRes.data);
+    };
 
-    api.get("/users").then((res) =>
-      setUsers(res.data)
-    );
+    void loadTask();
+    void loadLists();
   }, [id]);
 
   const handleSubmit = async (e) => {
@@ -52,105 +51,117 @@ function EditTask() {
       });
 
       alert("Task updated successfully");
-
       navigate("/tasks");
     } catch (err) {
       console.error(err);
-      alert("Failed to update task");
+      alert(err.response?.data?.error || err.response?.data?.message || "Failed to update task");
     }
   };
 
   return (
     <Layout>
-      <h1>Edit Task</h1>
+      <div className="dashboard-page">
+        <section className="dashboard-hero">
+          <div>
+            <span className="hero-note">Task entry</span>
+            <h1>Edit Task</h1>
+            <p>Update the task title, owner, project, due date, and completion status in one place.</p>
+          </div>
+          <div className="hero-note">Workspace task</div>
+        </section>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) =>
-            setTitle(e.target.value)
-          }
-          required
-        />
+        <section className="workspace-card">
+          <div className="card-header">
+            <div>
+              <span className="card-kicker">Tasks</span>
+              <h3>Edit details</h3>
+              <p>Keep the task aligned with its project and assignee before saving the change.</p>
+            </div>
+          </div>
 
-        <br /><br />
+          <form className="form-grid" onSubmit={handleSubmit}>
+            <div className="form-row">
+              <label className="field">
+                <span>Title</span>
+                <input
+                  type="text"
+                  placeholder="Task title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </label>
 
-        <textarea
-          value={description}
-          onChange={(e) =>
-            setDescription(e.target.value)
-          }
-        />
+              <label className="field">
+                <span>Deadline</span>
+                <input
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  required
+                />
+              </label>
+            </div>
 
-        <br /><br />
+            <label className="field">
+              <span>Description</span>
+              <textarea
+                placeholder="Task description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </label>
 
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="Pending">Pending</option>
-          <option value="In Progress">
-            In Progress
-          </option>
-          <option value="Completed">
-            Completed
-          </option>
-        </select>
+            <div className="form-row">
+              <label className="field">
+                <span>Status</span>
+                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </label>
 
-        <br /><br />
+              <label className="field">
+                <span>Project</span>
+                <select value={projectId} onChange={(e) => setProjectId(e.target.value)} required>
+                  <option value="">Select Project</option>
+                  {projects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-        <input
-          type="date"
-          value={deadline}
-          onChange={(e) =>
-            setDeadline(e.target.value)
-          }
-          required
-        />
+            <label className="field">
+              <span>Assigned User</span>
+              <select value={userId} onChange={(e) => setUserId(e.target.value)} required>
+                <option value="">Select User</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <br /><br />
+            <div className="lookup-helper">
+              If the task is already in progress, keep the project and owner in sync before marking it completed.
+            </div>
 
-        <select
-          value={projectId}
-          onChange={(e) =>
-            setProjectId(e.target.value)
-          }
-        >
-          {projects.map((project) => (
-            <option
-              key={project.id}
-              value={project.id}
-            >
-              {project.name}
-            </option>
-          ))}
-        </select>
-
-        <br /><br />
-
-        <select
-          value={userId}
-          onChange={(e) =>
-            setUserId(e.target.value)
-          }
-        >
-          {users.map((user) => (
-            <option
-              key={user.id}
-              value={user.id}
-            >
-              {user.name}
-            </option>
-          ))}
-        </select>
-
-        <br /><br />
-
-        <button type="submit">
-          Update Task
-        </button>
-      </form>
+            <div className="form-actions">
+              <button className="btn btn-secondary" type="button" onClick={() => navigate("/tasks")}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" type="submit">
+                Update Task
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
     </Layout>
   );
 }

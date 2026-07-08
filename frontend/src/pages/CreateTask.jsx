@@ -45,99 +45,108 @@ function CreateTask() {
 
   return (
     <Layout>
-      <h1>Create Task</h1>
+      <div className="dashboard-page">
+        <section className="dashboard-hero">
+          <div>
+            <span className="hero-note">Task entry</span>
+            <h1>Create Task</h1>
+            <p>Add a task to a project and assign it to the right employee with a due date and status.</p>
+          </div>
+          <div className="hero-note">Workspace task</div>
+        </section>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+        <section className="workspace-card">
+          <div className="card-header">
+            <div>
+              <span className="card-kicker">Tasks</span>
+              <h3>New task</h3>
+              <p>Every task should clearly show the project, owner, and completion path.</p>
+            </div>
+          </div>
 
-        <br /><br />
+          <form className="form-grid" onSubmit={handleSubmit}>
+            <div className="form-row">
+              <label className="field">
+                <span>Title</span>
+                <input
+                  type="text"
+                  placeholder="Task title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </label>
 
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) =>
-            setDescription(e.target.value)
-          }
-        />
+              <label className="field">
+                <span>Deadline</span>
+                <input
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  required
+                />
+              </label>
+            </div>
 
-        <br /><br />
+            <label className="field">
+              <span>Description</span>
+              <textarea
+                placeholder="Task description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </label>
 
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="Pending">Pending</option>
-          <option value="In Progress">
-            In Progress
-          </option>
-          <option value="Completed">
-            Completed
-          </option>
-        </select>
+            <div className="form-row">
+              <label className="field">
+                <span>Status</span>
+                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </label>
 
-        <br /><br />
+              <label className="field">
+                <span>Project</span>
+                <select value={projectId} onChange={(e) => setProjectId(e.target.value)} required>
+                  <option value="">Select Project</option>
+                  {projects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-        <input
-          type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          required
-        />
+            <label className="field">
+              <span>Assigned User</span>
+              <select value={userId} onChange={(e) => setUserId(e.target.value)} required>
+                <option value="">Select User</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <br /><br />
+            <div className="lookup-helper">
+              Use a short title and assign the task to one project owner so the workflow stays clear.
+            </div>
 
-        <select
-          value={projectId}
-          onChange={(e) =>
-            setProjectId(e.target.value)
-          }
-          required
-        >
-          <option value="">Select Project</option>
-
-          {projects.map((project) => (
-            <option
-              key={project.id}
-              value={project.id}
-            >
-              {project.name}
-            </option>
-          ))}
-        </select>
-
-        <br /><br />
-
-        <select
-          value={userId}
-          onChange={(e) =>
-            setUserId(e.target.value)
-          }
-          required
-        >
-          <option value="">Select User</option>
-
-          {users.map((user) => (
-            <option
-              key={user.id}
-              value={user.id}
-            >
-              {user.name}
-            </option>
-          ))}
-        </select>
-
-        <br /><br />
-
-        <button type="submit">
-          Create Task
-        </button>
-      </form>
+            <div className="form-actions">
+              <button className="btn btn-secondary" type="button" onClick={() => navigate("/tasks")}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" type="submit">
+                Create Task
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
     </Layout>
   );
 }

@@ -37,7 +37,7 @@ function Dashboard() {
           <div className="dashboard-hero-copy">
             <span className="hero-note">Workspace overview</span>
             <h1>ERP Dashboard</h1>
-            <p>Quick visibility into people, projects, leave, payroll, and support.</p>
+            <p>Quick visibility into people, projects, leave, payroll, and support activity.</p>
           </div>
           <div className="dashboard-hero-rail">
             <span className="hero-note">Live from backend</span>
@@ -50,27 +50,27 @@ function Dashboard() {
 
         <section className="stats-grid">
           <div className="stat-card">
-            <div className="label">Employees</div>
+            <div className="label">Employee count</div>
             <div className="value">{data.totalEmployees}</div>
             <div className="hint">Registered employee accounts</div>
           </div>
           <div className="stat-card">
-            <div className="label">Projects</div>
+            <div className="label">Project count</div>
             <div className="value">{data.totalProjects}</div>
             <div className="hint">All tracked projects</div>
           </div>
           <div className="stat-card">
-            <div className="label">Active projects</div>
+            <div className="label">Active work</div>
             <div className="value">{data.activeProjects}</div>
             <div className="hint">Projects currently underway</div>
           </div>
           <div className="stat-card">
-            <div className="label">Pending leaves</div>
+            <div className="label">Pending leave</div>
             <div className="value">{data.pendingLeaves}</div>
             <div className="hint">Leaves awaiting approval</div>
           </div>
           <div className="stat-card">
-            <div className="label">Salary paid</div>
+            <div className="label">Payroll paid</div>
             <div className="value">{currency.format(data.totalPayrollPaid || 0)}</div>
             <div className="hint">{data.totalPayrollRecords || 0} payroll records</div>
           </div>
@@ -81,7 +81,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <span className="card-kicker">Workstream</span>
-                <h3>Recent Projects</h3>
+                <h3>Recent projects</h3>
               </div>
               <span className="card-count">{data.recentProjects.length}</span>
             </div>
@@ -108,7 +108,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <span className="card-kicker">Snapshot</span>
-                <h3>Operations</h3>
+                <h3>Operations snapshot</h3>
               </div>
               <span className="card-count">Live</span>
             </div>
@@ -150,7 +150,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <span className="card-kicker">People</span>
-                <h3>Latest Leaves</h3>
+                <h3>Latest leaves</h3>
               </div>
               <span className="card-count">{data.recentLeaves.length}</span>
             </div>
@@ -175,7 +175,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <span className="card-kicker">Support</span>
-                <h3>Latest Tickets</h3>
+                <h3>Latest tickets</h3>
               </div>
               <span className="card-count">{data.recentTickets.length}</span>
             </div>
@@ -200,7 +200,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <span className="card-kicker">Finance</span>
-                <h3>Latest Payroll</h3>
+                <h3>Latest payroll</h3>
               </div>
               <span className="card-count">{data.recentPayrolls.length}</span>
             </div>

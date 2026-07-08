@@ -10,6 +10,7 @@ import CreateTeam from "./pages/CreateTeam";
 import Projects from "./pages/Projects";
 import Tasks from "./pages/Tasks";
 import Attendance from "./pages/Attendance";
+import AttendanceSettings from "./pages/AttendanceSettings";
 import LeaveRequests from "./pages/LeaveRequests";
 import SupportTickets from "./pages/SupportTickets";
 import SupportTicketDetails from "./pages/SupportTicketDetails";
@@ -49,6 +50,7 @@ function App() {
         <Route path="/projects" element={protectedPage(<Projects />)} />
         <Route path="/tasks" element={protectedPage(<Tasks />)} />
         <Route path="/attendance" element={protectedPage(<Attendance />)} />
+        <Route path="/attendance-settings" element={protectedPage(<AttendanceSettings />, ROLES.ADMIN)} />
         <Route path="/leave-requests" element={protectedPage(<LeaveRequests />)} />
         <Route path="/support-tickets" element={protectedPage(<SupportTickets />)} />
         <Route path="/support-tickets/:id" element={protectedPage(<SupportTicketDetails />)} />

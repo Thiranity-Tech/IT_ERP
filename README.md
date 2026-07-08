@@ -2,6 +2,14 @@
 
 Internal ERP application for employees, projects, attendance, leave, payroll, support tickets, and analytics.
 
+## Current Workflow
+
+- Super Admin manages users, departments, payroll base salary, and company records.
+- Admin manages attendance timing settings and can import attendance.
+- Manager handles projects, teams, employee lookup, and departmental workflows.
+- Team Leads manage tasks and approvals within their team scope.
+- Employees use the portal for attendance, leave, payroll, support tickets, and notifications.
+
 ## Repository Layout
 
 - `backend` - Node.js, Express, Prisma, PostgreSQL API
@@ -9,6 +17,15 @@ Internal ERP application for employees, projects, attendance, leave, payroll, su
 - `mobile-app` - Android Studio app
 - `docs` - SRS, API list, role matrix, ER diagram
 - `assets` - Shared project assets
+
+## Docs
+
+- `docs/ERP_SRS.docx` - project requirements and scope
+- `docs/API_List.xlsx` - API reference
+- `docs/Role_Matrix.xlsx` - role and permission mapping
+- `docs/ER_Diagram.drawio` - database diagram
+- `docs/Attendance_Import_Template.xlsx` - attendance upload template
+- `docs/Attendance_Import_Guide.md` - attendance file format guide
 
 ## Backend
 
@@ -94,3 +111,18 @@ Common endpoints:
 - `GET /attendance`
 - `GET /leave-requests`
 - `GET /notifications`
+
+## Attendance Import Format
+
+Attendance import uses these columns:
+
+- `employeeId`
+- `date`
+- `checkIn`
+- `checkOut`
+
+Optional columns:
+
+- `remarks`
+
+The backend calculates late minutes and overtime from the admin-defined office timing rules.
