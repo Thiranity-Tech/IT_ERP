@@ -32,7 +32,6 @@ function Payroll() {
   const [incentiveAmount, setIncentiveAmount] = useState("");
   const [lossOfPay, setLossOfPay] = useState("");
   const [generating, setGenerating] = useState(false);
-  const [lastDetails, setLastDetails] = useState(null);
   const setSalaryUsers = users.filter((user) => Number(user.salary || 0) > 0);
   const baseSalaryCardRef = useRef(null);
 
@@ -101,7 +100,6 @@ function Payroll() {
     try {
       setGenerating(true);
       const res = await api.post("/payrolls/generate", payload);
-      setLastDetails(res.data.details || null);
       setOvertimeAmount("");
       setIncentiveAmount("");
       setLossOfPay("");
@@ -218,19 +216,19 @@ function Payroll() {
             <div className="hint">Generated this period</div>
           </div>
           <div className="stat-card">
-            <div className="label">Salary Set</div>
+            <div className="label">Net Paid</div>
+            <div className="value">{currency.format(summary.totalSalaryPaid || 0)}</div>
+            <div className="hint">Released payroll amount</div>
+          </div>
+          <div className="stat-card">
+            <div className="label">Base Salaries</div>
             <div className="value">{setSalaryUsers.length || 0}</div>
-            <div className="hint">Employees with base salary</div>
+            <div className="hint">Employees already configured</div>
           </div>
           <div className="stat-card">
             <div className="label">Pending Setup</div>
             <div className="value">{Math.max(users.length - setSalaryUsers.length, 0)}</div>
-            <div className="hint">Employees without salary</div>
-          </div>
-          <div className="stat-card">
-            <div className="label">Net Paid</div>
-            <div className="value">{currency.format(summary.totalSalaryPaid || 0)}</div>
-            <div className="hint">Released payroll amount</div>
+            <div className="hint">Employees still to configure</div>
           </div>
         </section>
 
@@ -384,20 +382,6 @@ function Payroll() {
 
         <section className="workspace-card payroll-records-card">
           <h3>Generated Salary</h3>
-            {lastDetails && (
-              <div className="dashboard-list payroll-snapshot">
-                <PayrollMetric label="Base salary" value={currency.format(lastDetails.baseSalary || 0)} />
-                <PayrollMetric label="Working days" value={lastDetails.workingDays || 0} />
-                <PayrollMetric label="Present days" value={lastDetails.presentDays || 0} />
-                <PayrollMetric label="Absent days" value={lastDetails.absentDays || 0} />
-                <PayrollMetric label="Overtime minutes" value={lastDetails.overtimeMinutes || 0} />
-                <PayrollMetric
-                  label="Recorded incentives"
-                  value={currency.format(lastDetails.recordedIncentives || 0)}
-                />
-              </div>
-            )}
-
             <div className="table-scroll">
               <table className="erp-table">
                 <thead>
@@ -467,18 +451,6 @@ function Payroll() {
         </section>
       </div>
     </Layout>
-  );
-}
-
-function PayrollMetric({ label, value }) {
-  return (
-    <div className="activity-row">
-      <div>
-        <strong>{label}</strong>
-        <span>Generated from attendance and payroll rules</span>
-      </div>
-      <span className="pill pill-blue">{value}</span>
-    </div>
   );
 }
 
