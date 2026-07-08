@@ -159,9 +159,14 @@ function Payroll() {
     setSalaryUserId(String(user.id));
     setBaseSalary(user.salary ?? "");
     requestAnimationFrame(() => {
-      baseSalaryCardRef.current?.scrollIntoView({
+      const card = baseSalaryCardRef.current;
+      if (!card) return;
+
+      const headerOffset = 112;
+      const top = card.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({
+        top: Math.max(top, 0),
         behavior: "smooth",
-        block: "start",
       });
     });
   };
