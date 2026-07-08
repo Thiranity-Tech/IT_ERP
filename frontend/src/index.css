@@ -805,6 +805,10 @@ textarea {
   min-width: 0;
 }
 
+.payroll-work-card {
+  scroll-margin-top: 24px;
+}
+
 .payroll-divider {
   height: 1px;
   margin: 22px 0;

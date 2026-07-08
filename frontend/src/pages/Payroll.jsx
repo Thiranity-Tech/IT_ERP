@@ -34,7 +34,7 @@ function Payroll() {
   const [generating, setGenerating] = useState(false);
   const [lastDetails, setLastDetails] = useState(null);
   const setSalaryUsers = users.filter((user) => Number(user.salary || 0) > 0);
-  const baseSalaryFormRef = useRef(null);
+  const baseSalaryCardRef = useRef(null);
 
   const fetchPayroll = useCallback(async () => {
     try {
@@ -159,7 +159,7 @@ function Payroll() {
     setSalaryUserId(String(user.id));
     setBaseSalary(user.salary ?? "");
     requestAnimationFrame(() => {
-      baseSalaryFormRef.current?.scrollIntoView({
+      baseSalaryCardRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
@@ -309,9 +309,9 @@ function Payroll() {
                 </form>
               </div>
 
-              <div className="workspace-card payroll-work-card">
+              <div className="workspace-card payroll-work-card" ref={baseSalaryCardRef}>
                 <h3>Set Base Salary</h3>
-                <form className="form-grid" onSubmit={handleSaveBaseSalary} ref={baseSalaryFormRef}>
+                <form className="form-grid" onSubmit={handleSaveBaseSalary}>
                   <label className="field">
                     <span>Employee</span>
                     <select
