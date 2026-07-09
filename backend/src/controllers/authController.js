@@ -1,6 +1,7 @@
 const prisma = require("../prisma/client");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const { DEFAULT_ROLES, ROLES } = require("../constants/roles");
 
 const ensureDefaultRoles = async () => {
@@ -12,6 +13,70 @@ const ensureDefaultRoles = async () => {
         create: role
       })
     )
+  );
+};
+
+const generateResetPin = () => String(Math.floor(100000 + Math.random() * 900000));
+
+const maskEmail = (email) => {
+  if (!email) return "";
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  const visible = local.slice(0, 2);
+  return `${visible}${"*".repeat(Math.max(local.length - 2, 3))}@${domain}`;
+};
+
+const buildEmailTransporter = () => {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const secure = String(process.env.SMTP_SECURE || "").toLowerCase() === "true";
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) {
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: {
+      user,
+      pass
+    }
+  });
+};
+
+const sendPasswordResetPin = async ({ destination, pin, employeeId }) => {
+  const withTimeout = (promise, ms = 15000) =>
+    Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Delivery timed out")), ms)
+      )
+    ]);
+
+  const transporter = buildEmailTransporter();
+  if (!transporter) {
+    throw new Error("Email delivery is not configured");
+  }
+
+  await withTimeout(
+    transporter.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to: destination,
+      subject: "Your IT ERP password reset code",
+      text: `Your password reset code for employee ${employeeId} is ${pin}. It expires in 10 minutes.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+          <h2>IT ERP Password Reset</h2>
+          <p>Your verification code is:</p>
+          <div style="font-size: 28px; font-weight: bold; letter-spacing: 4px;">${pin}</div>
+          <p>This code expires in 10 minutes.</p>
+        </div>
+      `
+    })
   );
 };
 
@@ -207,22 +272,186 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(
-      newPassword,
-      10
-    );
-
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({
       where: { employeeId },
+      data: { password: hashedPassword }
+    });
+
+    res.json({ message: "Password reset successful" });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
+const requestPasswordReset = async (req, res) => {
+  try {
+    const employeeId = typeof req.body.employeeId === "string" ? req.body.employeeId.trim() : "";
+
+    if (!employeeId) {
+      return res.status(400).json({
+        message: "Employee ID is required"
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { employeeId }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+    const destination = user.email;
+
+    if (!destination) {
+      return res.status(400).json({
+        message: "Email not found for this user"
+      });
+    }
+
+    const pin = generateResetPin();
+    const pinHash = await bcrypt.hash(pin, 10);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    const request = await prisma.passwordResetRequest.create({
+      data: {
+        employeeId,
+        deliveryMethod: "email",
+        destination,
+        pinHash,
+        expiresAt,
+        userId: user.id
+      }
+    });
+
+    try {
+      await sendPasswordResetPin({
+        destination,
+        pin,
+        employeeId
+      });
+    } catch (sendError) {
+      await prisma.passwordResetRequest.delete({
+        where: { id: request.id }
+      });
+      throw sendError;
+    }
+
+    res.status(201).json({
+      message: `Verification code sent to ${maskEmail(destination)}`,
+      requestId: request.id,
+      deliveryMethod: "email",
+      destination: maskEmail(destination)
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
+const verifyPasswordReset = async (req, res) => {
+  try {
+    const requestId = Number(req.body.requestId);
+    const pin = typeof req.body.pin === "string" ? req.body.pin.trim() : "";
+
+    if (!requestId || !pin) {
+      return res.status(400).json({
+        message: "Request ID and PIN are required"
+      });
+    }
+
+    const request = await prisma.passwordResetRequest.findUnique({
+      where: { id: requestId }
+    });
+
+    if (!request) {
+      return res.status(404).json({
+        message: "Reset request not found"
+      });
+    }
+
+    if (request.expiresAt < new Date()) {
+      return res.status(400).json({
+        message: "Verification code has expired"
+      });
+    }
+
+    const isMatch = await bcrypt.compare(pin, request.pinHash);
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid verification code"
+      });
+    }
+
+    await prisma.passwordResetRequest.update({
+      where: { id: request.id },
+      data: {
+        verified: true,
+        verifiedAt: new Date()
+      }
+    });
+
+    res.json({
+      message: "Verification successful"
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
+const completePasswordReset = async (req, res) => {
+  try {
+    const requestId = Number(req.body.requestId);
+    const newPassword = typeof req.body.newPassword === "string" ? req.body.newPassword : "";
+
+    if (!requestId || !newPassword) {
+      return res.status(400).json({
+        message: "Request ID and new password are required"
+      });
+    }
+
+    const request = await prisma.passwordResetRequest.findUnique({
+      where: { id: requestId },
+      include: { user: true }
+    });
+
+    if (!request) {
+      return res.status(404).json({
+        message: "Reset request not found"
+      });
+    }
+
+    if (!request.verified) {
+      return res.status(400).json({
+        message: "Verification required before resetting password"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: request.userId },
       data: {
         password: hashedPassword
       }
     });
 
+    await prisma.passwordResetRequest.delete({
+      where: { id: request.id }
+    });
+
     res.json({
       message: "Password reset successful"
     });
-
   } catch (error) {
     res.status(500).json({
       error: error.message
@@ -233,5 +462,8 @@ module.exports = {
   createSuperAdmin,
   login,
   changePassword,
-  forgotPassword
+  forgotPassword,
+  requestPasswordReset,
+  verifyPasswordReset,
+  completePasswordReset
 };

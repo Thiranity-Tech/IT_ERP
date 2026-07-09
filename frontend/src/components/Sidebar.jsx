@@ -12,6 +12,7 @@ import {
   FiPieChart,
   FiUsers,
   FiSettings,
+  FiKey,
 } from "react-icons/fi";
 import { ROLES } from "../constants/roles";
 
@@ -43,6 +44,12 @@ const navGroups = [
       { to: "/users", label: "Users", icon: FiUsers, minRole: ROLES.MANAGER },
       { to: "/departments", label: "Departments", icon: FiLayers, minRole: ROLES.ADMIN },
       { to: "/teams", label: "Teams", icon: FiLayers, minRole: ROLES.MANAGER },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
+      { to: "/change-password", label: "Change Password", icon: FiKey },
     ],
   },
 ];

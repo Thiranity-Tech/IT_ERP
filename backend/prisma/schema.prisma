@@ -62,6 +62,7 @@ model User {
   supportTicketNotes SupportTicketNote[]
   supportTicketEvents SupportTicketEvent[]
   assignedSupportTickets SupportTicket[] @relation("SupportTicketAssignee")
+  passwordResetRequests PasswordResetRequest[]
 }
 
 model Project {
@@ -256,4 +257,19 @@ model ProjectNote {
 
   project Project @relation(fields: [projectId], references: [id])
   user    User    @relation(fields: [userId], references: [id])
+}
+
+model PasswordResetRequest {
+  id             Int      @id @default(autoincrement())
+  employeeId     String
+  deliveryMethod String
+  destination    String
+  pinHash        String
+  verified       Boolean  @default(false)
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  verifiedAt     DateTime?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

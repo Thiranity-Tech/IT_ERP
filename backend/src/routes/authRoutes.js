@@ -5,7 +5,10 @@ const {
   createSuperAdmin,
   login,
   changePassword,
-  forgotPassword
+  forgotPassword,
+  requestPasswordReset,
+  verifyPasswordReset,
+  completePasswordReset
 } = require("../controllers/authController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -30,4 +33,7 @@ router.post(
   "/forgot-password",
   forgotPassword
 );
+router.post("/request-password-reset", requestPasswordReset);
+router.post("/verify-password-reset", verifyPasswordReset);
+router.post("/complete-password-reset", completePasswordReset);
 module.exports = router;

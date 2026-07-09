@@ -31,6 +31,7 @@ import EditAttendance from "./pages/EditAttendance";
 import CreateLeaveRequest from "./pages/CreateLeaveRequest";
 import EditLeaveRequest from "./pages/EditLeaveRequest";
 import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   const protectedPage = (page, minRole = ROLES.USER) => (
@@ -70,6 +71,7 @@ function App() {
         <Route path="/create-leave-request" element={protectedPage(<CreateLeaveRequest />)} />
         <Route path="/edit-leave-request/:id" element={protectedPage(<EditLeaveRequest />)} />
         <Route path="/change-password" element={protectedPage(<ChangePassword />)} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>

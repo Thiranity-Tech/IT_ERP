@@ -1,12 +1,17 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Login() {
   const navigate = useNavigate();
+  const usernameRef = useRef(null);
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    usernameRef.current?.focus();
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -64,6 +69,8 @@ function Login() {
             <label className="field">
               <span>Username</span>
               <input
+                ref={usernameRef}
+                autoFocus
                 type="text"
                 placeholder="Enter Username"
                 value={employeeId}
@@ -89,6 +96,10 @@ function Login() {
               </button>
             </div>
           </form>
+
+          <div className="auth-links">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </div>
 
         </div>
       </section>

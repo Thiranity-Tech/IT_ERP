@@ -41,8 +41,11 @@ function ChangePassword() {
             <span>Current password</span>
             <input
               type="password"
+              autoComplete="current-password"
+              autoFocus
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Enter current password"
               required
             />
           </label>
@@ -51,8 +54,10 @@ function ChangePassword() {
             <span>New password</span>
             <input
               type="password"
+              autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
               required
             />
           </label>
