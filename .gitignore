@@ -9,11 +9,12 @@ npm-debug.log*
 # Backend uploads generated during testing
 backend/uploads/*
 !backend/uploads/.gitkeep
+backend/.env
 
 # Frontend output
 frontend/dist/
 frontend/.vite/
-
+frontend/.env
 # Android
 mobile-app/.gradle/
 mobile-app/build/
