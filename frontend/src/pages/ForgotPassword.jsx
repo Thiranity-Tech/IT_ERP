@@ -1,9 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import PasswordInput from "../components/PasswordInput";
 
 function ForgotPassword() {
   const navigate = useNavigate();
+  const employeeIdRef = useRef(null);
+  const pinRef = useRef(null);
+  const newPasswordRef = useRef(null);
   const [step, setStep] = useState("request");
   const [employeeId, setEmployeeId] = useState("");
   const [requestId, setRequestId] = useState("");
@@ -25,6 +29,16 @@ function ForgotPassword() {
     return "Use your employee ID and we will send the reset code to your registered email.";
   }, [step, destination]);
 
+  useEffect(() => {
+    if (step === "request") {
+      employeeIdRef.current?.focus();
+    } else if (step === "verify") {
+      pinRef.current?.focus();
+    } else if (step === "reset") {
+      newPasswordRef.current?.focus();
+    }
+  }, [step]);
+
   const requestReset = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -37,11 +51,14 @@ function ForgotPassword() {
       });
       setRequestId(String(res.data.requestId));
       setDestination(res.data.destination || "");
+      if (res.data.devHint) {
+        console.info(res.data.devHint);
+      }
       setStep("verify");
     } catch (err) {
       const message =
         err.code === "ECONNABORTED"
-          ? "Delivery is taking too long. Check SMTP/Twilio settings and try again."
+          ? "Delivery is taking too long. Check Brevo API or SMTP settings and try again."
           : err.response?.data?.message || err.response?.data?.error || "Unable to send verification code";
       setError(message);
     } finally {
@@ -114,6 +131,7 @@ function ForgotPassword() {
               <label className="field">
                 <span>Employee ID</span>
                 <input
+                  ref={employeeIdRef}
                   autoFocus
                   type="text"
                   placeholder="Enter employee ID"
@@ -136,6 +154,7 @@ function ForgotPassword() {
               <label className="field">
                 <span>Verification code</span>
                 <input
+                  ref={pinRef}
                   autoFocus
                   type="text"
                   inputMode="numeric"
@@ -161,9 +180,9 @@ function ForgotPassword() {
             <form className="form-grid" onSubmit={completeReset}>
               <label className="field">
                 <span>New password</span>
-                <input
+                <PasswordInput
+                  ref={newPasswordRef}
                   autoFocus
-                  type="password"
                   placeholder="Enter new password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}

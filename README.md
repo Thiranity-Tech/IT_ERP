@@ -92,6 +92,14 @@ Configure `backend\.env`:
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/it_erp
 JWT_SECRET=your_secret_key
 PORT=3000
+CORS_ORIGIN=http://localhost:5173
+BREVO_API_KEY=your_brevo_api_key
+SMTP_FROM="IT ERP <your_verified_brevo_sender@example.com>"
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_brevo_login_email
+SMTP_PASS=your_brevo_smtp_key
 ```
 
 ## API Checks

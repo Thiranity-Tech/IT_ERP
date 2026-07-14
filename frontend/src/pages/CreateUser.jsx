@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import Layout from "../components/Layout";
+import PasswordInput from "../components/PasswordInput";
 import {
   DEFAULT_ROLES,
   roleRequiresDepartment,
@@ -162,13 +163,12 @@ function CreateUser() {
 
           <label className="field">
             <span>Password</span>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+            <PasswordInput
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </label>
 
           <label className="field">

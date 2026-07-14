@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import PasswordInput from "../components/PasswordInput";
 
 function Login() {
   const navigate = useNavigate();
@@ -81,8 +82,7 @@ function Login() {
 
             <label className="field">
               <span>Password</span>
-              <input
-                type="password"
+              <PasswordInput
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

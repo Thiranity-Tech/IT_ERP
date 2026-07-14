@@ -1,7 +1,7 @@
 const prisma = require("../prisma/client");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const { sendPasswordResetPin } = require("../services/emailService");
 const { DEFAULT_ROLES, ROLES } = require("../constants/roles");
 
 const ensureDefaultRoles = async () => {
@@ -24,60 +24,6 @@ const maskEmail = (email) => {
   if (!domain) return email;
   const visible = local.slice(0, 2);
   return `${visible}${"*".repeat(Math.max(local.length - 2, 3))}@${domain}`;
-};
-
-const buildEmailTransporter = () => {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const secure = String(process.env.SMTP_SECURE || "").toLowerCase() === "true";
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (!host || !user || !pass) {
-    return null;
-  }
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: {
-      user,
-      pass
-    }
-  });
-};
-
-const sendPasswordResetPin = async ({ destination, pin, employeeId }) => {
-  const withTimeout = (promise, ms = 15000) =>
-    Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Delivery timed out")), ms)
-      )
-    ]);
-
-  const transporter = buildEmailTransporter();
-  if (!transporter) {
-    throw new Error("Email delivery is not configured");
-  }
-
-  await withTimeout(
-    transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: destination,
-      subject: "Your IT ERP password reset code",
-      text: `Your password reset code for employee ${employeeId} is ${pin}. It expires in 10 minutes.`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5;">
-          <h2>IT ERP Password Reset</h2>
-          <p>Your verification code is:</p>
-          <div style="font-size: 28px; font-weight: bold; letter-spacing: 4px;">${pin}</div>
-          <p>This code expires in 10 minutes.</p>
-        </div>
-      `
-    })
-  );
 };
 
 const createSuperAdmin = async (req, res) => {
@@ -347,7 +293,10 @@ const requestPasswordReset = async (req, res) => {
       message: `Verification code sent to ${maskEmail(destination)}`,
       requestId: request.id,
       deliveryMethod: "email",
-      destination: maskEmail(destination)
+      destination: maskEmail(destination),
+      ...(String(process.env.EMAIL_DEV_MODE || "").toLowerCase() === "true"
+        ? { devHint: "Check backend console for the reset code while Brevo is activating." }
+        : {})
     });
   } catch (error) {
     res.status(500).json({

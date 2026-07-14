@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import Layout from "../components/Layout";
+import PasswordInput from "../components/PasswordInput";
 
 function ChangePassword() {
   const navigate = useNavigate();
@@ -39,8 +40,7 @@ function ChangePassword() {
         <form className="form-grid" onSubmit={handleSubmit}>
           <label className="field">
             <span>Current password</span>
-            <input
-              type="password"
+            <PasswordInput
               autoComplete="current-password"
               autoFocus
               value={currentPassword}
@@ -52,8 +52,7 @@ function ChangePassword() {
 
           <label className="field">
             <span>New password</span>
-            <input
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
