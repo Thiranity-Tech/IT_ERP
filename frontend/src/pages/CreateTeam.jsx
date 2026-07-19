@@ -24,7 +24,7 @@ function CreateTeam() {
 
     try {
       await api.post("/teams", {
-        name,
+        name: name.trim(),
         departmentId,
       });
 
@@ -48,7 +48,10 @@ function CreateTeam() {
     <Layout>
       <div className="panel panel-narrow">
         <div className="panel-heading">
-          <h1>Create Team</h1>
+          <div>
+            <p className="eyebrow">Team Settings</p>
+            <h1>Create Team</h1>
+          </div>
         </div>
 
         <form className="form-grid" onSubmit={handleSubmit}>
@@ -56,7 +59,7 @@ function CreateTeam() {
             <span>Team Name</span>
             <input
               type="text"
-              placeholder="Team Name"
+              placeholder="Enter team name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required

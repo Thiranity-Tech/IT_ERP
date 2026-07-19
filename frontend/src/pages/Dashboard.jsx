@@ -37,10 +37,8 @@ function Dashboard() {
           <div className="dashboard-hero-copy">
             <span className="hero-note">Workspace overview</span>
             <h1>ERP Dashboard</h1>
-            <p>Quick visibility into people, projects, leave, payroll, and support activity.</p>
           </div>
           <div className="dashboard-hero-rail">
-            <span className="hero-note">Live from backend</span>
             <strong>{data.totalEmployees} employees</strong>
             <small>
               {data.totalProjects} projects - {data.openTickets} open tickets
@@ -106,12 +104,11 @@ function Dashboard() {
 
           <div className="workspace-card">
             <div className="card-header">
-              <div>
-                <span className="card-kicker">Snapshot</span>
-                <h3>Operations snapshot</h3>
-              </div>
-              <span className="card-count">Live</span>
+            <div>
+              <span className="card-kicker">Snapshot</span>
+              <h3>Operations snapshot</h3>
             </div>
+          </div>
             <div className="dashboard-list">
               <div className="activity-row">
                 <div className="row-copy">

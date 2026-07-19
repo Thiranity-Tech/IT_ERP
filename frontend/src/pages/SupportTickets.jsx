@@ -10,8 +10,9 @@ function SupportTickets() {
   const roleId = Number(localStorage.getItem("roleId") || 1);
   const departmentName = (localStorage.getItem("departmentName") || localStorage.getItem("teamName") || "").trim();
   const isCrmDepartment = departmentName.toUpperCase() === "CRM";
-  const canApproveTickets = roleId >= ROLES.MANAGER && isCrmDepartment;
-  const canEditTicket = isCrmDepartment;
+  const canCreateTicket = roleId >= ROLES.SUPER_ADMIN || isCrmDepartment;
+  const canApproveTickets = roleId >= ROLES.SUPER_ADMIN || (roleId >= ROLES.MANAGER && isCrmDepartment);
+  const canEditTicket = roleId >= ROLES.SUPER_ADMIN || isCrmDepartment;
 
   useEffect(() => {
     api.get("/support-tickets")
@@ -50,6 +51,17 @@ function SupportTickets() {
           <h1>Support Tickets</h1>
           <p className="subtle">CRM support requests and client issues.</p>
         </div>
+        {canCreateTicket && (
+          <div className="actions">
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/create-support-ticket")}
+              type="button"
+            >
+              Create Support Ticket
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="recent-grid">

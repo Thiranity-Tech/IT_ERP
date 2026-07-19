@@ -3,11 +3,25 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import PasswordInput from "../components/PasswordInput";
 
+const recoveryQuotes = [
+  "Secure access keeps good work moving.",
+  "A small reset can put the whole day back on track.",
+  "Strong systems make recovery simple.",
+  "Good operations protect both people and progress.",
+  "Clarity starts with safe access.",
+];
+
+function getRecoveryQuote() {
+  const day = Math.floor(Date.now() / 86400000);
+  return recoveryQuotes[day % recoveryQuotes.length];
+}
+
 function ForgotPassword() {
   const navigate = useNavigate();
   const employeeIdRef = useRef(null);
   const pinRef = useRef(null);
   const newPasswordRef = useRef(null);
+  const quoteRef = useRef(getRecoveryQuote());
   const [step, setStep] = useState("request");
   const [employeeId, setEmployeeId] = useState("");
   const [requestId, setRequestId] = useState("");
@@ -110,17 +124,12 @@ function ForgotPassword() {
       <section className="auth-panel">
         <div className="login-panel">
           <div className="login-heading">
-            <span className="login-kicker">Account recovery</span>
             <div className="login-title-row">
               <div className="login-logo">IE</div>
               <div>
                 <h1>{title}</h1>
                 <p>{subtitle}</p>
               </div>
-            </div>
-            <div className="login-meta">
-              <span className="meta-chip">Email code</span>
-              <span className="meta-chip">Secure reset</span>
             </div>
           </div>
 
@@ -205,6 +214,17 @@ function ForgotPassword() {
             <Link to="/">Back to sign in</Link>
           </div>
         </div>
+        <aside className="auth-art" aria-hidden="true">
+          <div className="auth-shape auth-shape-coral" />
+          <div className="auth-shape auth-shape-cyan" />
+          <div className="auth-art-card">
+            <span>Account recovery</span>
+            <h2>{quoteRef.current}</h2>
+            <p>
+              Reset your password through the registered company email and return to your ERP workspace.
+            </p>
+          </div>
+        </aside>
       </section>
     </div>
   );

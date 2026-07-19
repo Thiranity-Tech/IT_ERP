@@ -3,9 +3,77 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import PasswordInput from "../components/PasswordInput";
 
+const workQuotes = [
+  "Small improvements, done daily, become the system everyone trusts.",
+  "Clear work creates calm teams.",
+  "Progress is easier when every detail has a place.",
+  "A good workflow removes noise before it becomes pressure.",
+  "Teams move faster when information is easy to find.",
+  "Reliable records are quiet confidence.",
+  "Plan the work, track the truth, improve the day.",
+  "Great operations feel simple because the hard parts are organized.",
+  "The best teams do not chase updates; they build them into the flow.",
+  "Clean systems give people more room to think.",
+  "Every accurate entry protects tomorrow's decision.",
+  "Good work becomes great when the process supports it.",
+  "Organized teams spend less time searching and more time solving.",
+  "A calm dashboard is a productive team's morning coffee.",
+  "Strong operations are built one dependable record at a time.",
+  "Make the next step obvious, and work starts moving.",
+  "When the workflow is clear, people can focus on the work.",
+  "Better visibility turns busy days into managed days.",
+  "A useful system helps people finish, not just report.",
+  "Consistency is the quiet engine of every growing company.",
+  "Good tools do not shout; they make work feel lighter.",
+  "The right record today prevents the wrong question tomorrow.",
+  "Clarity is a team advantage.",
+  "Track what matters, simplify what repeats.",
+  "A smooth process is respect for everyone's time.",
+  "Reliable systems turn effort into momentum.",
+  "Less confusion, more completion.",
+  "Every workflow should help the team breathe easier.",
+  "Great execution starts with shared clarity.",
+  "A well-run day begins with information in the right place.",
+  "Simple systems scale better than complicated reminders.",
+];
+
+function getDailyQuote() {
+  const today = new Date().toISOString().slice(0, 10);
+  const storageKey = "itErpDailyQuoteHistory";
+  const fallbackIndex = Math.floor(Date.now() / 86400000) % workQuotes.length;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    if (saved.date === today && Number.isInteger(saved.index)) {
+      return workQuotes[saved.index] || workQuotes[fallbackIndex];
+    }
+
+    const used = Array.isArray(saved.used) ? saved.used : [];
+    const remaining = workQuotes
+      .map((_, index) => index)
+      .filter((index) => !used.includes(index));
+    const pool = remaining.length ? remaining : workQuotes.map((_, index) => index);
+    const index = pool[fallbackIndex % pool.length];
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        date: today,
+        index,
+        used: remaining.length ? [...used, index] : [index],
+      })
+    );
+
+    return workQuotes[index];
+  } catch (error) {
+    return workQuotes[fallbackIndex];
+  }
+}
+
 function Login() {
   const navigate = useNavigate();
   const usernameRef = useRef(null);
+  const quoteRef = useRef(getDailyQuote());
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,18 +115,12 @@ function Login() {
       <section className="auth-panel">
         <div className="login-panel">
           <div className="login-heading">
-            <span className="login-kicker">Company workspace</span>
             <div className="login-title-row">
               <div className="login-logo">IE</div>
               <div>
-                <h1>IT ERP</h1>
-                <p>Internal operations suite for employees, managers, and admins.</p>
+                <h1>Welcome back</h1>
+                <p>Sign in to continue to your company ERP workspace.</p>
               </div>
-            </div>
-            <div className="login-meta">
-              <span className="meta-chip">Secure sign-in</span>
-              <span className="meta-chip">Role-based access</span>
-              <span className="meta-chip">Payroll and HR workflow</span>
             </div>
           </div>
           <div className="panel-heading">
@@ -90,18 +152,25 @@ function Login() {
               />
             </label>
 
-            <div className="form-actions">
+            <div className="login-form-footer">
+              <Link to="/forgot-password">Forgot password?</Link>
               <button className="btn btn-primary" type="submit" disabled={loading}>
                 {loading ? "Signing in..." : "Sign in"}
               </button>
             </div>
           </form>
-
-          <div className="auth-links">
-            <Link to="/forgot-password">Forgot password?</Link>
-          </div>
-
         </div>
+        <aside className="auth-art" aria-hidden="true">
+          <div className="auth-shape auth-shape-coral" />
+          <div className="auth-shape auth-shape-cyan" />
+          <div className="auth-art-card">
+            <span>Today's focus</span>
+            <h2>{quoteRef.current}</h2>
+            <p>
+              One workspace for the records, approvals, and daily movement that keep work flowing.
+            </p>
+          </div>
+        </aside>
       </section>
     </div>
   );

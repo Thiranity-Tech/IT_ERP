@@ -19,11 +19,19 @@ const getTeams = async (req, res) => {
 const createTeam = async (req, res) => {
   try {
     const { name, departmentId } = req.body;
+    const teamName = String(name || "").trim();
+    const numericDepartmentId = Number(departmentId);
+
+    if (!teamName || !numericDepartmentId) {
+      return res.status(400).json({
+        error: "Team name and department are required."
+      });
+    }
 
     const team = await prisma.team.create({
       data: {
-        name,
-        departmentId: Number(departmentId)
+        name: teamName,
+        departmentId: numericDepartmentId
       }
     });
 
@@ -55,14 +63,22 @@ const getTeamById = async (req, res) => {
 const updateTeam = async (req, res) => {
   try {
     const { name, departmentId } = req.body;
+    const teamName = String(name || "").trim();
+    const numericDepartmentId = Number(departmentId);
+
+    if (!teamName || !numericDepartmentId) {
+      return res.status(400).json({
+        error: "Team name and department are required."
+      });
+    }
 
     const team = await prisma.team.update({
       where: {
         id: Number(req.params.id)
       },
       data: {
-        name,
-        departmentId: Number(departmentId)
+        name: teamName,
+        departmentId: numericDepartmentId
       }
     });
 

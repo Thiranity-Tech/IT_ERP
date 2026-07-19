@@ -36,7 +36,7 @@ function EditDepartment() {
 
   return (
     <Layout>
-      <h1>Edit Department</h1>
+      <h1>Rename Department</h1>
 
       <form onSubmit={handleSubmit}>
         <input

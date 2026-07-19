@@ -7,6 +7,7 @@ import Users from "./pages/Users";
 import Departments from "./pages/Departments";
 import Teams from "./pages/Teams";
 import CreateTeam from "./pages/CreateTeam";
+import EditTeam from "./pages/EditTeam";
 import Projects from "./pages/Projects";
 import Tasks from "./pages/Tasks";
 import Attendance from "./pages/Attendance";
@@ -14,6 +15,7 @@ import AttendanceSettings from "./pages/AttendanceSettings";
 import LeaveRequests from "./pages/LeaveRequests";
 import SupportTickets from "./pages/SupportTickets";
 import SupportTicketDetails from "./pages/SupportTicketDetails";
+import CreateSupportTicket from "./pages/CreateSupportTicket";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
 import EmployeeAnalytics from "./pages/EmployeeAnalytics";
@@ -48,12 +50,14 @@ function App() {
         <Route path="/departments" element={protectedPage(<Departments />, ROLES.ADMIN)} />
         <Route path="/teams" element={protectedPage(<Teams />, ROLES.MANAGER)} />
         <Route path="/create-team" element={protectedPage(<CreateTeam />, ROLES.MANAGER)} />
+        <Route path="/edit-team/:id" element={protectedPage(<EditTeam />, ROLES.MANAGER)} />
         <Route path="/projects" element={protectedPage(<Projects />)} />
         <Route path="/tasks" element={protectedPage(<Tasks />)} />
         <Route path="/attendance" element={protectedPage(<Attendance />)} />
         <Route path="/attendance-settings" element={protectedPage(<AttendanceSettings />, ROLES.ADMIN)} />
         <Route path="/leave-requests" element={protectedPage(<LeaveRequests />)} />
         <Route path="/support-tickets" element={protectedPage(<SupportTickets />)} />
+        <Route path="/create-support-ticket" element={protectedPage(<CreateSupportTicket />, ROLES.USER)} />
         <Route path="/support-tickets/:id" element={protectedPage(<SupportTicketDetails />)} />
         <Route path="/notifications" element={protectedPage(<Notifications />)} />
         <Route path="/payroll" element={protectedPage(<Payroll />)} />
