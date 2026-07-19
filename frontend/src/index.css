@@ -890,7 +890,7 @@ textarea {
 
 .auth-art-card p {
   max-width: 36rem;
-  color: var(--muted);
+  color: #021a2e;
   font-size: 1.05rem;
   line-height: 1.7;
 }
