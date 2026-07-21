@@ -186,11 +186,14 @@ function Payroll() {
     const pdfBlob = buildPayslipPdf(payroll);
     const url = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
+    const downloadDate = new Date().toISOString().slice(0, 10);
+    const employeeId = String(payroll.user?.employeeId || payroll.user?.name || "employee")
+      .replace(/[^a-z0-9-_]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .toUpperCase();
 
     link.href = url;
-    link.download = `payslip-${String(payroll.user?.employeeId || payroll.user?.name || "employee")
-      .replace(/[^a-z0-9-_]+/gi, "-")
-      .toLowerCase()}-${payroll.month}.pdf`;
+    link.download = `${downloadDate}_${employeeId}.pdf`;
     document.body.appendChild(link);
     link.click();
     link.remove();
