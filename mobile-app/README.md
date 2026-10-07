@@ -1,19 +1,26 @@
 # IT ERP Android App
 
-Native Android client for the IT ERP backend in this repository.
+Android package of the current web frontend. Each Android build rebuilds the
+web app in `../frontend` and packages the result into the APK, so the phone UI
+stays aligned with the web UI.
+
+## Current integration status
+
+The Android app packages the same shared email sign-in and company registration
+screen as the web app. Creating a company starts a private 30-day trial and
+uses its email domain as the workspace boundary. The platform administrator can
+renew, trial, or block workspaces without deleting their data.
+
+When the web frontend is connected to the backend API, the Android build will
+package those changes automatically. For a live API on a physical phone, use a
+network-reachable HTTPS API URL (or allow local HTTP only for development).
 
 ## What is included
 
-- Login with `/auth/login`.
-- JWT storage and automatic `Authorization: Bearer <token>` headers.
-- Dashboard counters from `/dashboard`.
-- List screens for projects, tasks, attendance, leave requests, notifications, daily scrums, users, teams, departments, clients, support tickets, payrolls, incentives, reports, and analytics.
-- Leave request submission through `/leave-requests`.
-- Daily scrum submission through `/daily-scrums`.
-- Password update through `/auth/change-password`.
-- Leave approval/rejection for manager-level users and above.
-- Notification mark-as-read action.
-- Debug-only backend base URL override for emulator and physical devices.
+- The same current React frontend that is built for the web.
+- Mobile WebView support, including browser storage and responsive layout.
+- Automatic frontend rebuild and asset sync whenever Gradle builds the Android app.
+- A debug-only backend URL setting retained for the API-connected frontend.
 
 ## Tools workflow
 
@@ -82,9 +89,17 @@ Authorization: Bearer {{token}}
 
 1. Open this `mobile-app` folder in Android Studio.
 2. Let Gradle sync and install any missing Android SDK packages.
-3. Start the backend first.
-4. Run the app on an emulator.
-5. The app default API URL is:
+3. Connect your Android phone by USB, enable **Developer options** and **USB
+   debugging**, then accept the RSA prompt on the phone.
+4. Select your phone in Android Studio's device selector and press **Run**.
+   Android Studio builds the current web UI and installs the debug APK.
+5. Alternatively, choose **Build > Build APK(s)**, then transfer and open
+   `app/build/outputs/apk/debug/app-debug.apk` on the phone. You may need to
+   allow installs from the file manager you use.
+
+The current frontend is a local demo, so starting the backend is not required
+to preview it on a phone. The app's development API URL is retained for the
+live-backend frontend version:
 
 ```text
 http://10.0.2.2:3000
