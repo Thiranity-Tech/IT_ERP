@@ -149,6 +149,20 @@ const createUser = async (req, res) => {
       });
     }
 
+    const normalizedEmail = String(email).trim().toLowerCase();
+    if (req.user.companyId) {
+      const company = await prisma.company.findUnique({
+        where: { id: req.user.companyId },
+        select: { emailDomain: true }
+      });
+      const emailDomain = normalizedEmail.split("@")[1];
+      if (!emailDomain || emailDomain !== company?.emailDomain) {
+        return res.status(400).json({
+          error: `Users in this workspace must use an @${company?.emailDomain || "company"} email address.`
+        });
+      }
+    }
+
     const numericRoleId = Number(roleId);
     const assignment = normalizeAssignment(numericRoleId, teamId, departmentId);
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -158,7 +172,7 @@ const createUser = async (req, res) => {
         data: {
           employeeId,
           name,
-          email,
+          email: normalizedEmail,
           phone: phone || null,
           designation: designation || null,
           salary:
@@ -167,6 +181,7 @@ const createUser = async (req, res) => {
               : Number(salary),
           password: hashedPassword,
           roleId: numericRoleId,
+          companyId: req.user.companyId || null,
           teamId: assignment.teamId,
           departmentId: assignment.departmentId
         },

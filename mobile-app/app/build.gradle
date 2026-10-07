@@ -77,7 +77,10 @@ android {
 
     sourceSets {
         main {
-            assets.srcDirs += "$buildDir/generated/web-config"
+            // The Android app is a packaged copy of the current web frontend.
+            // Keeping it in the build directory prevents stale checked-in assets
+            // from being shipped after the frontend changes.
+            assets.srcDirs = ["$buildDir/generated/mobile-web"]
         }
     }
 
@@ -106,17 +109,19 @@ android {
     }
 }
 
-tasks.register("generateWebConfig") {
-    outputs.file("$buildDir/generated/web-config/web/config.js")
-    doLast {
-        def outputDir = file("$buildDir/generated/web-config/web")
-        outputDir.mkdirs()
-        file("$outputDir/config.js").text = "window.__IT_ERP_CONFIG__ = { apiBaseUrl: ${groovy.json.JsonOutput.toJson(webApiBaseUrl)} };"
-    }
+tasks.register("buildWebFrontend", Exec) {
+    workingDir rootProject.file("../frontend")
+    commandLine "cmd", "/c", "npm run build"
+}
+
+tasks.register("syncWebFrontend", Sync) {
+    dependsOn("buildWebFrontend")
+    from rootProject.file("../frontend/dist")
+    into "$buildDir/generated/mobile-web/web"
 }
 
 tasks.named("preBuild") {
-    dependsOn("generateWebConfig")
+    dependsOn("syncWebFrontend")
 }
 
 if (adbExecutable?.exists()) {

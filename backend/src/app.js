@@ -25,6 +25,8 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const officeSettingRoutes = require("./routes/officeSettingRoutes");
+const platformRoutes = require("./routes/platformRoutes");
+const tenantContextMiddleware = require("./middleware/tenantContextMiddleware");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -45,6 +47,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(tenantContextMiddleware);
 app.set("trust proxy", 1);
 
 app.get("/", (req, res) => {
@@ -82,6 +85,7 @@ app.use("/search", searchRoutes);
 app.use("/analytics", analyticsRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 app.use("/api/office-settings", officeSettingRoutes);
+app.use("/platform", platformRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

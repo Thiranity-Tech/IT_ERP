@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   createSuperAdmin,
+  registerCompany,
   login,
   changePassword,
   forgotPassword,
@@ -14,6 +15,7 @@ const {
 const authMiddleware = require("../middleware/authMiddleware");
 
 router.post("/create-super-admin", createSuperAdmin);
+router.post("/register-company", registerCompany);
 
 router.post("/login", login);
 

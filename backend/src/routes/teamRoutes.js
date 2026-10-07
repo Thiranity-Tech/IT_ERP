@@ -11,9 +11,10 @@ const {
   updateTeam,
   deleteTeam
 } = require("../controllers/teamController");
-router.post("/", authMiddleware, authorize(...TEAM_ADMIN_ROLE_IDS), createTeam);
-router.put("/:id", authMiddleware, authorize(...TEAM_ADMIN_ROLE_IDS), updateTeam);
-router.delete("/:id", authMiddleware, authorize(...TEAM_ADMIN_ROLE_IDS), deleteTeam);
+router.use(authMiddleware);
+router.post("/", authorize(...TEAM_ADMIN_ROLE_IDS), createTeam);
+router.put("/:id", authorize(...TEAM_ADMIN_ROLE_IDS), updateTeam);
+router.delete("/:id", authorize(...TEAM_ADMIN_ROLE_IDS), deleteTeam);
 router.get("/", getTeams);
 router.get("/:id", getTeamById);
 module.exports = router;
