@@ -95,12 +95,13 @@ const registerCompany = async (req, res) => {
     await ensureDefaultRoles();
     const name = String(req.body.companyName || "").trim();
     const ownerName = String(req.body.name || "").trim();
+    const phone = String(req.body.phone || "").trim();
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password || "");
     const domain = getEmailDomain(email);
 
-    if (!name || !ownerName || !email || !password) {
-      return res.status(400).json({ message: "Company name, full name, work email, and password are required." });
+    if (!name || !ownerName || !phone || !email || !password) {
+      return res.status(400).json({ message: "Company name, full name, phone number, work email, and password are required." });
     }
     if (!domain || PUBLIC_EMAIL_DOMAINS.has(domain)) {
       return res.status(400).json({ message: "Use your company email address (for example, name@company.com)." });
@@ -120,6 +121,7 @@ const registerCompany = async (req, res) => {
           employeeId: `ADMIN-${company.id}`,
           name: ownerName,
           email,
+          phone,
           password: passwordHash,
           roleId: ROLES.SUPER_ADMIN,
           companyId: company.id,
