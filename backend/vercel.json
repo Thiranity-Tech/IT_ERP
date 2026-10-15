@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npx prisma generate",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "prisma/**"
+    }
+  }
+}

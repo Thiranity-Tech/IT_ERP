@@ -47,6 +47,10 @@ const maskEmail = (email) => {
 
 const createSuperAdmin = async (req, res) => {
   try {
+    const bootstrapSecret = String(req.get("x-platform-bootstrap-secret") || "");
+    if (!process.env.PLATFORM_BOOTSTRAP_SECRET || bootstrapSecret !== process.env.PLATFORM_BOOTSTRAP_SECRET) {
+      return res.status(403).json({ message: "A valid platform bootstrap secret is required." });
+    }
     await ensureDefaultRoles();
 
     const existingSuperAdmin = await prisma.user.findUnique({
@@ -61,13 +65,20 @@ const createSuperAdmin = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const name = String(req.body.name || "").trim();
+    const email = normalizeEmail(req.body.email);
+    const password = String(req.body.password || "");
+    if (!name || !email || password.length < 8) {
+      return res.status(400).json({ message: "Name, email, and a password of at least 8 characters are required." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const superAdmin = await prisma.user.create({
       data: {
         employeeId: "SA001",
-        name: "Super Admin",
-        email: "superadmin@erp.com",
+        name,
+        email,
         password: hashedPassword,
         roleId: ROLES.SUPER_ADMIN,
         isPlatformAdmin: true
