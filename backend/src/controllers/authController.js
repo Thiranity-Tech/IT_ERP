@@ -53,23 +53,26 @@ const createSuperAdmin = async (req, res) => {
     }
     await ensureDefaultRoles();
 
-    const existingSuperAdmin = await prisma.user.findUnique({
-      where: {
-        employeeId: "SA001"
-      }
-    });
-
-    if (existingSuperAdmin) {
-      return res.status(409).json({
-        message: "Super Admin already exists"
-      });
-    }
-
     const name = String(req.body.name || "").trim();
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password || "");
     if (!name || !email || password.length < 8) {
       return res.status(400).json({ message: "Name, email, and a password of at least 8 characters are required." });
+    }
+
+    const existingSuperAdmin = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { employeeId: "SA001", companyId: null },
+          { email }
+        ]
+      }
+    });
+
+    if (existingSuperAdmin) {
+      return res.status(409).json({
+        message: "A platform administrator or this email already exists."
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
