@@ -25,10 +25,19 @@ const workspaceNavItems = [
 ];
 
 async function request(path, options = {}) {
-  const response = await fetch(`${apiBaseUrl}${path}`, { headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || data.error || 'Something went wrong.');
-  return data;
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(`${apiBaseUrl}${path}`, { ...options, signal: controller.signal, headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || data.error || 'Something went wrong.');
+    return data;
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('The server took too long to respond. Please try again.', { cause: error });
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 export default function App() {

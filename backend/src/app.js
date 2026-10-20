@@ -47,6 +47,11 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Keep API handlers safe when a client sends an empty or malformed JSON body.
+app.use((req, res, next) => {
+  req.body ||= {};
+  next();
+});
 app.use(tenantContextMiddleware);
 app.set("trust proxy", 1);
 
