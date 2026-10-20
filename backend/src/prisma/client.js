@@ -1,7 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const tenantContext = require("../services/tenantContext");
 
-const basePrisma = new PrismaClient();
+// Reuse the database client while a Vercel function instance is warm. Creating
+// a fresh Prisma client per request adds a costly database connection handshake.
+const prismaGlobal = globalThis;
+const basePrisma = prismaGlobal.__itErpPrisma || new PrismaClient();
+prismaGlobal.__itErpPrisma = basePrisma;
 
 const TENANT_MODELS = new Set([
   "User", "Department", "Team", "Project", "Task", "Attendance",
